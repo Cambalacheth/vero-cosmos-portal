@@ -86,3 +86,8 @@
   color: transparent;
   background-image: linear-gradient(to right, #D9C589, #BBA764);
 }
+
+/* Adding text shadow for better readability on background images */
+.text-shadow-lg {
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}

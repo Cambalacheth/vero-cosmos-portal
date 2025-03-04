@@ -12,7 +12,7 @@ const Home = () => {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <BackgroundImage fullHeight={false}>
+      <BackgroundImage fullHeight={false} usePlainBackground={true}>
         <div className="container mx-auto px-4 py-6">
           <div 
             className={`w-full transition-all duration-1000 delay-300 transform
