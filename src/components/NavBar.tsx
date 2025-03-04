@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, CalendarDays, Sparkles, BookOpen } from 'lucide-react';
+import { Home, CalendarDays, Sparkles, BookOpen, UserRound } from 'lucide-react';
 
 const NavBar = () => {
   const location = useLocation();
@@ -26,6 +26,11 @@ const NavBar = () => {
       name: 'Aprender',
       icon: BookOpen,
       path: '/aprender'
+    },
+    {
+      name: 'Perfil',
+      icon: UserRound,
+      path: '/perfil'
     }
   ];
 
