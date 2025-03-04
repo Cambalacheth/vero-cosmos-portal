@@ -22,10 +22,18 @@ const NatalChartForm: React.FC<NatalChartFormProps> = ({ onSubmit }) => {
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
   const [locationResults, setLocationResults] = useState<Location[]>([]);
 
-  // Update results when search changes
+  // Update results when search changes - with safety check
   useEffect(() => {
-    if (birthplaceOpen) {
-      setLocationResults(searchLocations(birthplaceSearch));
+    if (birthplaceOpen && birthplaceSearch) {
+      try {
+        const results = searchLocations(birthplaceSearch);
+        setLocationResults(results || []);
+      } catch (error) {
+        console.error("Error searching locations:", error);
+        setLocationResults([]);
+      }
+    } else {
+      setLocationResults([]);
     }
   }, [birthplaceSearch, birthplaceOpen]);
 
@@ -100,29 +108,33 @@ const NatalChartForm: React.FC<NatalChartFormProps> = ({ onSubmit }) => {
                 <CommandInput 
                   placeholder="Buscar ciudad..." 
                   value={birthplaceSearch}
-                  onValueChange={setBirthplaceSearch}
+                  onValueChange={(value) => {
+                    setBirthplaceSearch(value);
+                  }}
                 />
                 <CommandEmpty>No se encontraron resultados.</CommandEmpty>
                 <CommandGroup>
-                  {locationResults.map((location) => (
-                    <CommandItem
-                      key={location.id}
-                      value={location.id}
-                      onSelect={() => {
-                        setSelectedLocation(location);
-                        setBirthplaceOpen(false);
-                        setBirthplaceSearch('');
-                      }}
-                    >
-                      <div className="flex items-center">
-                        <MapPin className="mr-2 h-4 w-4 text-cosmos-darkGold" />
-                        <span>{location.name}, {location.country}</span>
-                      </div>
-                      {selectedLocation?.id === location.id && (
-                        <Check className="ml-auto h-4 w-4 text-cosmos-darkGold" />
-                      )}
-                    </CommandItem>
-                  ))}
+                  {locationResults && locationResults.length > 0 ? (
+                    locationResults.map((location) => (
+                      <CommandItem
+                        key={location.id}
+                        value={location.id}
+                        onSelect={() => {
+                          setSelectedLocation(location);
+                          setBirthplaceOpen(false);
+                          setBirthplaceSearch('');
+                        }}
+                      >
+                        <div className="flex items-center">
+                          <MapPin className="mr-2 h-4 w-4 text-cosmos-darkGold" />
+                          <span>{location.name}, {location.country}</span>
+                        </div>
+                        {selectedLocation?.id === location.id && (
+                          <Check className="ml-auto h-4 w-4 text-cosmos-darkGold" />
+                        )}
+                      </CommandItem>
+                    ))
+                  ) : null}
                 </CommandGroup>
               </Command>
             </PopoverContent>
