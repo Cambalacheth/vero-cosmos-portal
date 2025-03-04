@@ -5,9 +5,18 @@ import NavBar from '../components/NavBar';
 import { getDailyAstrologyData, getCurrentCelestialPositions } from '../lib/astrology-service';
 import { drawCards } from '../lib/tarot-data';
 import TarotCard from '../components/TarotCard';
-import { Sparkles, MapPin, Calendar, Clock } from 'lucide-react';
-import { calculateNatalChart, generatePersonalizedHoroscope, NatalChartData, NatalChartInput } from '../lib/natal-chart-service';
+import { Sparkles, MapPin, Calendar, Clock, Check, X } from 'lucide-react';
+import { 
+  calculateNatalChart, 
+  generatePersonalizedHoroscope, 
+  NatalChartData, 
+  NatalChartInput, 
+  Location, 
+  searchLocations
+} from '../lib/natal-chart-service';
 import { Button } from '../components/ui/button';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '../components/ui/command';
+import { Popover, PopoverContent, PopoverTrigger } from '../components/ui/popover';
 
 const Home = () => {
   const [loaded, setLoaded] = useState(false);
@@ -19,7 +28,10 @@ const Home = () => {
   // State for natal chart input form
   const [birthDate, setBirthDate] = useState<Date | null>(null);
   const [birthTime, setBirthTime] = useState('');
-  const [birthplace, setBirthplace] = useState('');
+  const [birthplaceOpen, setBirthplaceOpen] = useState(false);
+  const [birthplaceSearch, setBirthplaceSearch] = useState('');
+  const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
+  const [locationResults, setLocationResults] = useState<Location[]>([]);
   
   // State for calculated natal chart data
   const [natalChart, setNatalChart] = useState<NatalChartData | null>(null);
@@ -32,19 +44,26 @@ const Home = () => {
     setLoaded(true);
   }, []);
 
+  // Actualizar resultados cuando cambia la búsqueda
+  useEffect(() => {
+    if (birthplaceOpen) {
+      setLocationResults(searchLocations(birthplaceSearch));
+    }
+  }, [birthplaceSearch, birthplaceOpen]);
+
   const handleRevealCard = () => {
     setIsCardRevealed(true);
   };
   
   const handleCreateNatalChart = () => {
-    if (!birthDate || !birthTime || !birthplace) {
+    if (!birthDate || !birthTime || !selectedLocation) {
       return; // No podemos calcular sin los datos completos
     }
     
     const input: NatalChartInput = {
       birthDate,
       birthTime,
-      birthplace
+      birthplace: selectedLocation
     };
     
     const calculatedChart = calculateNatalChart(input);
@@ -141,23 +160,70 @@ const Home = () => {
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Lugar de Nacimiento</label>
-              <div className="relative">
-                <MapPin size={16} className="absolute left-2 top-1/2 -translate-y-1/2 text-cosmos-darkGold" />
-                <input 
-                  type="text" 
-                  className="w-full p-2 pl-8 bg-white bg-opacity-30 border border-cosmos-pink rounded-lg" 
-                  placeholder="Ej. Madrid, España" 
-                  value={birthplace}
-                  onChange={(e) => setBirthplace(e.target.value)}
-                />
-              </div>
+              <Popover open={birthplaceOpen} onOpenChange={setBirthplaceOpen}>
+                <PopoverTrigger asChild>
+                  <Button 
+                    variant="outline" 
+                    role="combobox" 
+                    aria-expanded={birthplaceOpen}
+                    className="w-full justify-between bg-white bg-opacity-30 border border-cosmos-pink text-left font-normal"
+                  >
+                    <div className="flex items-center">
+                      <MapPin size={16} className="mr-2 text-cosmos-darkGold" />
+                      {selectedLocation ? 
+                        `${selectedLocation.name}, ${selectedLocation.country}` : 
+                        "Selecciona una ciudad..."}
+                    </div>
+                    {selectedLocation && (
+                      <X
+                        className="ml-2 h-4 w-4 shrink-0 opacity-50 hover:opacity-100"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedLocation(null);
+                        }}
+                      />
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[--radix-popover-trigger-width] p-0 max-h-[300px] overflow-auto">
+                  <Command>
+                    <CommandInput 
+                      placeholder="Buscar ciudad..." 
+                      value={birthplaceSearch}
+                      onValueChange={setBirthplaceSearch}
+                    />
+                    <CommandEmpty>No se encontraron resultados.</CommandEmpty>
+                    <CommandGroup>
+                      {locationResults.map((location) => (
+                        <CommandItem
+                          key={location.id}
+                          value={location.id}
+                          onSelect={() => {
+                            setSelectedLocation(location);
+                            setBirthplaceOpen(false);
+                            setBirthplaceSearch('');
+                          }}
+                        >
+                          <div className="flex items-center">
+                            <MapPin className="mr-2 h-4 w-4 text-cosmos-darkGold" />
+                            <span>{location.name}, {location.country}</span>
+                          </div>
+                          {selectedLocation?.id === location.id && (
+                            <Check className="ml-auto h-4 w-4 text-cosmos-darkGold" />
+                          )}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </Command>
+                </PopoverContent>
+              </Popover>
             </div>
           </div>
           
           <Button 
             className="w-full button-effect px-4 py-2 glass-card rounded-lg text-cosmos-darkGold border border-cosmos-pink"
             onClick={handleCreateNatalChart}
-            disabled={!birthDate || !birthTime || !birthplace}
+            disabled={!birthDate || !birthTime || !selectedLocation}
           >
             Crear Mi Carta Natal
           </Button>
