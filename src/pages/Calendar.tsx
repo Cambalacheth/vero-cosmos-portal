@@ -9,7 +9,7 @@ import { es } from 'date-fns/locale';
 import { getDailyAstrologyData } from '@/lib/astrology-service';
 import AstrologyDayDetails from '@/components/AstrologyDayDetails';
 import CelestialPositions from '@/components/CelestialPositions';
-import { DayContent } from 'react-day-picker';
+import { DayClickEventHandler } from 'react-day-picker';
 
 const Calendar = () => {
   const [loaded, setLoaded] = useState(false);
@@ -59,10 +59,9 @@ const Calendar = () => {
     );
   };
 
-  // Create a custom day component compatible with react-day-picker
-  const CustomDay: DayContent = (props) => {
-    const { date: dayDate } = props;
-    return renderDay(dayDate, date);
+  // Create a custom day content renderer function
+  const CustomDay = (props: { date: Date; displayMonth: Date }) => {
+    return renderDay(props.date, date);
   };
 
   return (
