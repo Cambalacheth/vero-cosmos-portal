@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { MapPin, Clock, X, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@/components/ui/command';
+import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { 
   NatalChartInput, 
@@ -21,26 +21,31 @@ const NatalChartForm: React.FC<NatalChartFormProps> = ({ onSubmit }) => {
   const [birthplaceSearch, setBirthplaceSearch] = useState('');
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
   const [locationResults, setLocationResults] = useState<Location[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
 
   // Update results when search changes - with debounce and safety check
   useEffect(() => {
-    // Solo buscar cuando el popover está abierto y la búsqueda tiene al menos 2 caracteres
-    if (birthplaceOpen && birthplaceSearch && birthplaceSearch.length >= 2) {
-      const timer = setTimeout(() => {
-        try {
-          const results = searchLocations(birthplaceSearch);
-          setLocationResults(results || []);
-          console.log("Resultados de búsqueda:", results);
-        } catch (error) {
-          console.error("Error searching locations:", error);
-          setLocationResults([]);
-        }
-      }, 300); // Debounce de 300ms para no disparar la búsqueda con cada pulsación de tecla
-      
-      return () => clearTimeout(timer);
-    } else {
+    if (!birthplaceOpen || !birthplaceSearch || birthplaceSearch.length < 2) {
       setLocationResults([]);
+      return;
     }
+
+    setIsSearching(true);
+    const timer = setTimeout(() => {
+      try {
+        const results = searchLocations(birthplaceSearch);
+        setLocationResults(results || []);
+        setIsSearching(false);
+      } catch (error) {
+        console.error("Error searching locations:", error);
+        setLocationResults([]);
+        setIsSearching(false);
+      }
+    }, 300); // Debounce de 300ms
+    
+    return () => {
+      clearTimeout(timer);
+    };
   }, [birthplaceSearch, birthplaceOpen]);
 
   const handleSubmit = () => {
@@ -57,13 +62,17 @@ const NatalChartForm: React.FC<NatalChartFormProps> = ({ onSubmit }) => {
     onSubmit(input);
   };
 
-  // Manejar el cambio en el campo de búsqueda de forma segura
-  const handleSearchChange = (value: string) => {
-    setBirthplaceSearch(value);
-    // Si el valor está vacío o es demasiado corto, limpiar los resultados
-    if (!value || value.length < 2) {
-      setLocationResults([]);
-    }
+  // Manejar selección de ubicación
+  const handleLocationSelect = (location: Location) => {
+    setSelectedLocation(location);
+    setBirthplaceOpen(false);
+    setBirthplaceSearch('');
+  };
+
+  // Limpiar selección
+  const clearSelection = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedLocation(null);
   };
 
   return (
@@ -110,52 +119,56 @@ const NatalChartForm: React.FC<NatalChartFormProps> = ({ onSubmit }) => {
                 {selectedLocation && (
                   <X
                     className="ml-2 h-4 w-4 shrink-0 opacity-50 hover:opacity-100"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSelectedLocation(null);
-                    }}
+                    onClick={clearSelection}
                   />
                 )}
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-[--radix-popover-trigger-width] p-0 max-h-[300px] overflow-auto">
-              <Command>
-                <CommandInput 
-                  placeholder="Escribe al menos 2 letras..." 
-                  value={birthplaceSearch}
-                  onValueChange={handleSearchChange}
-                />
-                <CommandEmpty>No se encontraron resultados.</CommandEmpty>
-                <CommandGroup>
-                  {locationResults && locationResults.length > 0 ? (
-                    locationResults.map((location) => (
-                      <CommandItem
-                        key={location.id}
-                        value={location.id}
-                        onSelect={() => {
-                          setSelectedLocation(location);
-                          setBirthplaceOpen(false);
-                          setBirthplaceSearch('');
-                        }}
-                      >
-                        <div className="flex items-center">
+            <PopoverContent className="w-[--radix-popover-trigger-width] p-0 max-h-[300px] overflow-auto bg-white">
+              <div className="p-2">
+                <div className="flex items-center border-b mb-2">
+                  <MapPin className="h-4 w-4 mr-2 text-cosmos-darkGold" />
+                  <Input 
+                    placeholder="Escribe al menos 2 letras..." 
+                    value={birthplaceSearch}
+                    onChange={(e) => setBirthplaceSearch(e.target.value)}
+                    className="border-0 focus-visible:ring-0 p-2 text-sm"
+                  />
+                </div>
+                
+                <div className="mt-2">
+                  {isSearching ? (
+                    <div className="text-center py-2 text-sm text-muted-foreground">
+                      Buscando...
+                    </div>
+                  ) : locationResults.length > 0 ? (
+                    <div className="space-y-1">
+                      {locationResults.map((location) => (
+                        <div
+                          key={location.id}
+                          className={`flex items-center p-2 text-sm rounded-md cursor-pointer 
+                                    ${selectedLocation?.id === location.id ? 'bg-accent text-accent-foreground' : 'hover:bg-muted'}`}
+                          onClick={() => handleLocationSelect(location)}
+                        >
                           <MapPin className="mr-2 h-4 w-4 text-cosmos-darkGold" />
                           <span>{location.name}, {location.country}</span>
+                          {selectedLocation?.id === location.id && (
+                            <Check className="ml-auto h-4 w-4 text-cosmos-darkGold" />
+                          )}
                         </div>
-                        {selectedLocation?.id === location.id && (
-                          <Check className="ml-auto h-4 w-4 text-cosmos-darkGold" />
-                        )}
-                      </CommandItem>
-                    ))
+                      ))}
+                    </div>
                   ) : (
-                    <div className="py-2 px-3 text-xs text-muted-foreground">
-                      {birthplaceSearch && birthplaceSearch.length < 2 
-                        ? "Escribe al menos 2 caracteres para buscar" 
-                        : ""}
+                    <div className="py-2 px-1 text-xs text-muted-foreground">
+                      {birthplaceSearch.length > 0 && birthplaceSearch.length < 2
+                        ? "Escribe al menos 2 caracteres para buscar"
+                        : birthplaceSearch.length >= 2
+                          ? "No se encontraron resultados."
+                          : "Comienza a escribir para buscar ciudades."}
                     </div>
                   )}
-                </CommandGroup>
-              </Command>
+                </div>
+              </div>
             </PopoverContent>
           </Popover>
         </div>
