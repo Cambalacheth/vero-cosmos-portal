@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Moon, Star, Sun } from 'lucide-react';
 import BackgroundImage from '../components/BackgroundImage';
 import Quote from '../components/Quote';
+import { Link } from 'react-router-dom';
 
 const Index = () => {
   const [loaded, setLoaded] = useState(false);
@@ -30,20 +31,21 @@ const Index = () => {
           
           <div className="h-px w-32 mx-auto bg-gradient-to-r from-transparent via-cosmos-gold to-transparent my-5" />
           
-          <div className={`transition-all duration-1000 delay-500 ${loaded ? 'opacity-100' : 'opacity-0'}`}>
-            <Quote />
+          <div className={`mt-6 mb-8 transition-all duration-1000 delay-700 ${loaded ? 'opacity-100' : 'opacity-0'}`}>
+            <Link to="/home">
+              <button 
+                className="button-effect group relative px-8 py-3 glass-card border-cosmos-pink border overflow-hidden rounded-full"
+              >
+                <span className="relative z-10 font-medium text-cosmos-darkGold group-hover:text-white transition-colors duration-300">
+                  Conoce tu Destino
+                </span>
+                <div className="absolute inset-0 bg-gradient-to-r from-cosmos-gold to-cosmos-darkGold opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-full"></div>
+              </button>
+            </Link>
           </div>
           
-          <div className={`mt-8 transition-all duration-1000 delay-700 ${loaded ? 'opacity-100' : 'opacity-0'}`}>
-            <button 
-              className="button-effect group relative px-8 py-3 glass-card border-cosmos-pink border overflow-hidden rounded-full"
-              onClick={() => window.location.href = '/'}
-            >
-              <span className="relative z-10 font-medium text-cosmos-darkGold group-hover:text-white transition-colors duration-300">
-                Conoce tu Destino
-              </span>
-              <div className="absolute inset-0 bg-gradient-to-r from-cosmos-gold to-cosmos-darkGold opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-full"></div>
-            </button>
+          <div className={`transition-all duration-1000 delay-500 ${loaded ? 'opacity-100' : 'opacity-0'}`}>
+            <Quote />
           </div>
         </div>
       </div>

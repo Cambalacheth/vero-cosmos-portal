@@ -3,9 +3,10 @@ import React, { useState, useEffect } from 'react';
 
 interface BackgroundImageProps {
   children: React.ReactNode;
+  fullHeight?: boolean;
 }
 
-const BackgroundImage: React.FC<BackgroundImageProps> = ({ children }) => {
+const BackgroundImage: React.FC<BackgroundImageProps> = ({ children, fullHeight = true }) => {
   const [loaded, setLoaded] = useState(false);
   
   useEffect(() => {
@@ -15,7 +16,7 @@ const BackgroundImage: React.FC<BackgroundImageProps> = ({ children }) => {
   }, []);
 
   return (
-    <div className="relative min-h-screen w-full overflow-hidden">
+    <div className={`relative ${fullHeight ? 'min-h-screen' : 'min-h-[calc(100vh-64px)]'} w-full overflow-hidden`}>
       <div 
         className={`absolute inset-0 bg-cosmos-lavender transition-opacity duration-1000 ease-in-out ${loaded ? 'opacity-0' : 'opacity-100'}`}
       />
@@ -29,7 +30,7 @@ const BackgroundImage: React.FC<BackgroundImageProps> = ({ children }) => {
       >
         <div className="absolute inset-0 cosmos-overlay" />
       </div>
-      <div className="relative z-10 min-h-screen">{children}</div>
+      <div className="relative z-10 h-full pb-16">{children}</div>
     </div>
   );
 };
