@@ -121,7 +121,7 @@ const Calendar = () => {
                     month={currentMonth}
                     className="rounded-md border-none"
                     components={{
-                      Day: ({ date: dayDate, selected }) => renderDay(dayDate, selected ? selected : new Date())
+                      Day: ({ day }) => renderDay(day, date)
                     }}
                   />
                 </div>
