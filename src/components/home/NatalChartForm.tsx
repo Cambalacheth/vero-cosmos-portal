@@ -22,16 +22,22 @@ const NatalChartForm: React.FC<NatalChartFormProps> = ({ onSubmit }) => {
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
   const [locationResults, setLocationResults] = useState<Location[]>([]);
 
-  // Update results when search changes - with safety check
+  // Update results when search changes - with debounce and safety check
   useEffect(() => {
-    if (birthplaceOpen && birthplaceSearch) {
-      try {
-        const results = searchLocations(birthplaceSearch);
-        setLocationResults(results || []);
-      } catch (error) {
-        console.error("Error searching locations:", error);
-        setLocationResults([]);
-      }
+    // Solo buscar cuando el popover está abierto y la búsqueda tiene al menos 2 caracteres
+    if (birthplaceOpen && birthplaceSearch && birthplaceSearch.length >= 2) {
+      const timer = setTimeout(() => {
+        try {
+          const results = searchLocations(birthplaceSearch);
+          setLocationResults(results || []);
+          console.log("Resultados de búsqueda:", results);
+        } catch (error) {
+          console.error("Error searching locations:", error);
+          setLocationResults([]);
+        }
+      }, 300); // Debounce de 300ms para no disparar la búsqueda con cada pulsación de tecla
+      
+      return () => clearTimeout(timer);
     } else {
       setLocationResults([]);
     }
@@ -49,6 +55,15 @@ const NatalChartForm: React.FC<NatalChartFormProps> = ({ onSubmit }) => {
     };
     
     onSubmit(input);
+  };
+
+  // Manejar el cambio en el campo de búsqueda de forma segura
+  const handleSearchChange = (value: string) => {
+    setBirthplaceSearch(value);
+    // Si el valor está vacío o es demasiado corto, limpiar los resultados
+    if (!value || value.length < 2) {
+      setLocationResults([]);
+    }
   };
 
   return (
@@ -106,11 +121,9 @@ const NatalChartForm: React.FC<NatalChartFormProps> = ({ onSubmit }) => {
             <PopoverContent className="w-[--radix-popover-trigger-width] p-0 max-h-[300px] overflow-auto">
               <Command>
                 <CommandInput 
-                  placeholder="Buscar ciudad..." 
+                  placeholder="Escribe al menos 2 letras..." 
                   value={birthplaceSearch}
-                  onValueChange={(value) => {
-                    setBirthplaceSearch(value);
-                  }}
+                  onValueChange={handleSearchChange}
                 />
                 <CommandEmpty>No se encontraron resultados.</CommandEmpty>
                 <CommandGroup>
@@ -134,7 +147,13 @@ const NatalChartForm: React.FC<NatalChartFormProps> = ({ onSubmit }) => {
                         )}
                       </CommandItem>
                     ))
-                  ) : null}
+                  ) : (
+                    <div className="py-2 px-3 text-xs text-muted-foreground">
+                      {birthplaceSearch && birthplaceSearch.length < 2 
+                        ? "Escribe al menos 2 caracteres para buscar" 
+                        : ""}
+                    </div>
+                  )}
                 </CommandGroup>
               </Command>
             </PopoverContent>

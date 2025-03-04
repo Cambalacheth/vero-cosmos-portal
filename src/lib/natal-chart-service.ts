@@ -64,15 +64,20 @@ export const LOCATIONS: Location[] = [
 
 // Función para buscar ciudades basada en un término de búsqueda
 export const searchLocations = (searchTerm: string): Location[] => {
-  if (!searchTerm || searchTerm.trim() === '') return [];
+  if (!searchTerm || searchTerm.trim() === '' || searchTerm.length < 2) return [];
   
   const normalizedSearch = searchTerm.toLowerCase().trim();
   
-  return LOCATIONS.filter(location => {
-    const cityMatch = location.name.toLowerCase().includes(normalizedSearch);
-    const countryMatch = location.country.toLowerCase().includes(normalizedSearch);
-    return cityMatch || countryMatch;
-  }).slice(0, 5); // Limitar a 5 resultados para no saturar la UI
+  try {
+    return LOCATIONS.filter(location => {
+      const cityMatch = location.name.toLowerCase().includes(normalizedSearch);
+      const countryMatch = location.country.toLowerCase().includes(normalizedSearch);
+      return cityMatch || countryMatch;
+    }).slice(0, 5); // Limitar a 5 resultados para no saturar la UI
+  } catch (error) {
+    console.error("Error filtering locations:", error);
+    return [];
+  }
 };
 
 // Función para obtener el signo zodiacal basado en la fecha
