@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { MapPin, Clock, X, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -8,7 +7,7 @@ import {
   NatalChartInput, 
   Location, 
   searchLocations 
-} from '@/lib/natal-chart-service';
+} from '@/lib/natal-chart';
 
 interface NatalChartFormProps {
   onSubmit: (data: NatalChartInput) => void;
@@ -23,7 +22,6 @@ const NatalChartForm: React.FC<NatalChartFormProps> = ({ onSubmit }) => {
   const [locationResults, setLocationResults] = useState<Location[]>([]);
   const [isSearching, setIsSearching] = useState(false);
 
-  // Update results when search changes - with debounce and safety check
   useEffect(() => {
     if (!birthplaceOpen || !birthplaceSearch || birthplaceSearch.length < 2) {
       setLocationResults([]);
@@ -41,8 +39,8 @@ const NatalChartForm: React.FC<NatalChartFormProps> = ({ onSubmit }) => {
         setLocationResults([]);
         setIsSearching(false);
       }
-    }, 300); // Debounce de 300ms
-    
+    }, 300);
+
     return () => {
       clearTimeout(timer);
     };
@@ -50,7 +48,7 @@ const NatalChartForm: React.FC<NatalChartFormProps> = ({ onSubmit }) => {
 
   const handleSubmit = () => {
     if (!birthDate || !birthTime || !selectedLocation) {
-      return; // Can't calculate without complete data
+      return;
     }
     
     const input: NatalChartInput = {
@@ -62,14 +60,12 @@ const NatalChartForm: React.FC<NatalChartFormProps> = ({ onSubmit }) => {
     onSubmit(input);
   };
 
-  // Manejar selección de ubicación
   const handleLocationSelect = (location: Location) => {
     setSelectedLocation(location);
     setBirthplaceOpen(false);
     setBirthplaceSearch('');
   };
 
-  // Limpiar selección
   const clearSelection = (e: React.MouseEvent) => {
     e.stopPropagation();
     setSelectedLocation(null);

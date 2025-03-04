@@ -2,7 +2,7 @@
 import React from 'react';
 import { Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { NatalChartData } from '@/lib/natal-chart-service';
+import { NatalChartData } from '@/lib/natal-chart';
 import { getDailyAstrologyData } from '@/lib/astrology-service';
 
 interface DailyHoroscopeProps {

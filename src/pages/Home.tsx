@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import BackgroundImage from '../components/BackgroundImage';
 import NavBar from '../components/NavBar';
@@ -7,7 +6,7 @@ import {
   generatePersonalizedHoroscope, 
   NatalChartData, 
   NatalChartInput 
-} from '../lib/natal-chart-service';
+} from '../lib/natal-chart';
 
 // Import the refactored components
 import TabNavigation from '../components/home/TabNavigation';
