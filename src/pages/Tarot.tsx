@@ -2,9 +2,15 @@
 import React, { useState, useEffect } from 'react';
 import { Sparkles, GalleryVertical, RotateCcw, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useToast } from '@/components/ui/use-toast';
 import BackgroundImage from '../components/BackgroundImage';
 import NavBar from '../components/NavBar';
 import Quote from '../components/Quote';
+import TarotCard from '../components/TarotCard';
+import TarotReading from '../components/TarotReading';
+import SavedReadings from '../components/SavedReadings';
+import { drawCards } from '../lib/tarot-data';
+import { saveReading, getReadings, SavedReading } from '../lib/tarot-storage';
 
 const tarotDecks = [
   { id: 'rider-waite', name: 'Rider-Waite', description: 'El tarot tradicional con simbolismo clásico' },
@@ -37,13 +43,65 @@ const readingTypes = [
 ];
 
 const Tarot = () => {
+  const { toast } = useToast();
   const [loaded, setLoaded] = useState(false);
   const [selectedDeck, setSelectedDeck] = useState(tarotDecks[0]);
   const [activeTab, setActiveTab] = useState('readings');
+  const [readingInProgress, setReadingInProgress] = useState(false);
+  const [selectedReadingType, setSelectedReadingType] = useState<typeof readingTypes[0] | null>(null);
+  const [drawnCards, setDrawnCards] = useState<ReturnType<typeof drawCards>>([]);
+  const [savedReadings, setSavedReadings] = useState<SavedReading[]>([]);
 
+  // Load saved readings on mount
   useEffect(() => {
+    setSavedReadings(getReadings());
     setLoaded(true);
   }, []);
+
+  // Start a new reading
+  const handleStartReading = (readingType: typeof readingTypes[0]) => {
+    setSelectedReadingType(readingType);
+    const cards = drawCards(readingType.cardCount);
+    setDrawnCards(cards);
+    setReadingInProgress(true);
+  };
+
+  // Save the current reading
+  const handleSaveReading = () => {
+    if (!selectedReadingType) return;
+    
+    const readingToSave = {
+      readingType: selectedReadingType,
+      deck: selectedDeck,
+      cards: drawnCards.map((card, index) => ({
+        ...card,
+        position: index,
+      })),
+    };
+    
+    const savedReading = saveReading(readingToSave);
+    
+    if (savedReading) {
+      setSavedReadings(prev => [...prev, savedReading]);
+      toast({
+        title: "Tirada guardada",
+        description: "Tu tirada ha sido guardada correctamente.",
+      });
+    } else {
+      toast({
+        title: "Error",
+        description: "No se pudo guardar la tirada. Inténtalo de nuevo.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Reset to selection screen
+  const handleNewReading = () => {
+    setReadingInProgress(false);
+    setSelectedReadingType(null);
+    setDrawnCards([]);
+  };
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -60,7 +118,12 @@ const Tarot = () => {
             <div className="flex justify-center mb-6">
               <div className="glass-card p-1 rounded-full flex">
                 <button 
-                  onClick={() => setActiveTab('readings')}
+                  onClick={() => {
+                    setActiveTab('readings');
+                    if (readingInProgress) {
+                      handleNewReading();
+                    }
+                  }}
                   className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                     activeTab === 'readings' 
                       ? 'bg-cosmos-pink bg-opacity-30 text-cosmos-darkGold' 
@@ -92,9 +155,10 @@ const Tarot = () => {
               </div>
             </div>
             
-            {/* Deck selection */}
-            {activeTab === 'readings' && (
+            {/* Readings Tab */}
+            {activeTab === 'readings' && !readingInProgress && (
               <>
+                {/* Deck selection */}
                 <div className="glass-card p-4 mb-6 rounded-xl">
                   <h3 className="text-lg font-playfair text-cosmos-darkGold mb-3">Escoge tu Mazo</h3>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -134,6 +198,7 @@ const Tarot = () => {
                             <Button 
                               size="sm" 
                               className="bg-gradient-to-r from-cosmos-gold to-cosmos-darkGold text-white"
+                              onClick={() => handleStartReading(reading)}
                             >
                               Comenzar Tirada
                             </Button>
@@ -146,22 +211,27 @@ const Tarot = () => {
               </>
             )}
             
+            {/* Active Reading */}
+            {activeTab === 'readings' && readingInProgress && selectedReadingType && (
+              <div className="glass-card p-4 mb-6 rounded-xl">
+                <TarotReading
+                  readingType={selectedReadingType}
+                  cards={drawnCards}
+                  onSaveReading={handleSaveReading}
+                  onNewReading={handleNewReading}
+                />
+              </div>
+            )}
+            
             {/* Saved readings */}
             {activeTab === 'saved' && (
-              <div className="glass-card p-4 rounded-xl min-h-[300px] flex flex-col items-center justify-center">
-                <Sparkles size={40} className="text-cosmos-gold opacity-50 mb-4" />
-                <h3 className="text-lg font-playfair text-cosmos-darkGold mb-2">Sin Tiradas Guardadas</h3>
-                <p className="text-sm text-center text-gray-600 max-w-xs">
-                  Aún no tienes tiradas guardadas. Realiza una tirada y guárdala para verla aquí.
-                </p>
-                <Button 
-                  onClick={() => setActiveTab('readings')}
-                  variant="outline" 
-                  className="mt-4 border-cosmos-pink text-cosmos-darkGold"
-                >
-                  Ir a Tiradas
-                </Button>
-              </div>
+              <SavedReadings 
+                readings={savedReadings} 
+                onStartNewReading={() => {
+                  setActiveTab('readings');
+                  handleNewReading();
+                }}
+              />
             )}
             
             {/* Learn section */}
