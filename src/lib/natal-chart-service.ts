@@ -1,3 +1,4 @@
+
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
@@ -80,23 +81,102 @@ export const searchLocations = (searchTerm: string): Location[] => {
   }
 };
 
-// Función para obtener el signo zodiacal basado en la fecha
+// Signos zodiacales con sus fechas aproximadas
+const zodiacSigns = [
+  { sign: "Aries", startMonth: 3, startDay: 21, endMonth: 4, endDay: 19 },
+  { sign: "Tauro", startMonth: 4, startDay: 20, endMonth: 5, endDay: 20 },
+  { sign: "Géminis", startMonth: 5, startDay: 21, endMonth: 6, endDay: 20 },
+  { sign: "Cáncer", startMonth: 6, startDay: 21, endMonth: 7, endDay: 22 },
+  { sign: "Leo", startMonth: 7, startDay: 23, endMonth: 8, endDay: 22 },
+  { sign: "Virgo", startMonth: 8, startDay: 23, endMonth: 9, endDay: 22 },
+  { sign: "Libra", startMonth: 9, startDay: 23, endMonth: 10, endDay: 22 },
+  { sign: "Escorpio", startMonth: 10, startDay: 23, endMonth: 11, endDay: 21 },
+  { sign: "Sagitario", startMonth: 11, startDay: 22, endMonth: 12, endDay: 21 },
+  { sign: "Capricornio", startMonth: 12, startDay: 22, endMonth: 1, endDay: 19 },
+  { sign: "Acuario", startMonth: 1, startDay: 20, endMonth: 2, endDay: 18 },
+  { sign: "Piscis", startMonth: 2, startDay: 19, endMonth: 3, endDay: 20 }
+];
+
+// Función para convertir hora local a UTC
+const convertToUTC = (date: Date, timeStr: string, longitudeHours: number): Date => {
+  const [hours, minutes] = timeStr.split(':').map(Number);
+  const localDate = new Date(date);
+  localDate.setHours(hours, minutes, 0, 0);
+  
+  // Ajuste por longitud (aproximado)
+  const utcDate = new Date(localDate.getTime() - (longitudeHours * 60 * 60 * 1000));
+  return utcDate;
+};
+
+// Función para calcular la Hora Sidérea (simplificado)
+const calculateSiderealTime = (utcDate: Date): number => {
+  // Fórmula simplificada para la hora sidérea
+  const year = utcDate.getFullYear();
+  const month = utcDate.getMonth() + 1;
+  const day = utcDate.getDate();
+  const hour = utcDate.getHours() + utcDate.getMinutes() / 60;
+  
+  // Días transcurridos desde J2000.0 (1 de enero de 2000, 12:00 UTC)
+  const j2000 = new Date(Date.UTC(2000, 0, 1, 12, 0, 0));
+  const daysSinceJ2000 = (utcDate.getTime() - j2000.getTime()) / (24 * 60 * 60 * 1000);
+  
+  // Cálculo aproximado de hora sidérea en Greenwich
+  const T = daysSinceJ2000 / 36525; // Siglos julianos
+  let siderealTimeGreenwich = 280.46061837 + 360.98564736629 * daysSinceJ2000;
+  siderealTimeGreenwich = siderealTimeGreenwich % 360; // Normalizar a 0-360 grados
+  
+  // Convertir a horas (0-24)
+  return siderealTimeGreenwich / 15;
+};
+
+// Función para ajustar la hora sidérea por longitud
+const adjustSiderealTimeByLongitude = (siderealTime: number, longitude: number): number => {
+  // Convertir longitud de grados a horas
+  const longitudeHours = longitude / 15;
+  let adjustedSiderealTime = siderealTime + longitudeHours;
+  
+  // Normalizar a 0-24 horas
+  while (adjustedSiderealTime < 0) adjustedSiderealTime += 24;
+  while (adjustedSiderealTime >= 24) adjustedSiderealTime -= 24;
+  
+  return adjustedSiderealTime;
+};
+
+// Función para calcular el Ascendente
+const calculateAscendant = (siderealTime: number, latitude: number): string => {
+  // Fórmula simplificada para el cálculo del Ascendente
+  // RAMC = Ascensión Recta del Mediocielo = Hora Sidérea Local * 15
+  const RAMC = siderealTime * 15;
+  
+  // Simulación del cálculo real del Ascendente
+  // En una implementación real, esto requeriría cálculos trigonométricos complejos
+  // Usamos una aproximación basada en la hora sidérea y la latitud
+  const ascIndex = Math.floor((RAMC + latitude / 2) / 30) % 12;
+  const signs = ["Aries", "Tauro", "Géminis", "Cáncer", "Leo", "Virgo", "Libra", "Escorpio", "Sagitario", "Capricornio", "Acuario", "Piscis"];
+  
+  return signs[ascIndex];
+};
+
+// Función para determinar el signo zodiacal basado en la fecha
 const getZodiacSign = (date: Date): string => {
   const month = date.getMonth() + 1;
   const day = date.getDate();
-
-  if ((month === 3 && day >= 21) || (month === 4 && day <= 19)) return "Aries";
-  if ((month === 4 && day >= 20) || (month === 5 && day <= 20)) return "Tauro";
-  if ((month === 5 && day >= 21) || (month === 6 && day <= 20)) return "Géminis";
-  if ((month === 6 && day >= 21) || (month === 7 && day <= 22)) return "Cáncer";
-  if ((month === 7 && day >= 23) || (month === 8 && day <= 22)) return "Leo";
-  if ((month === 8 && day >= 23) || (month === 9 && day <= 22)) return "Virgo";
-  if ((month === 9 && day >= 23) || (month === 10 && day <= 22)) return "Libra";
-  if ((month === 10 && day >= 23) || (month === 11 && day <= 21)) return "Escorpio";
-  if ((month === 11 && day >= 22) || (month === 12 && day <= 21)) return "Sagitario";
-  if ((month === 12 && day >= 22) || (month === 1 && day <= 19)) return "Capricornio";
-  if ((month === 1 && day >= 20) || (month === 2 && day <= 18)) return "Acuario";
-  return "Piscis";
+  
+  for (const zodiac of zodiacSigns) {
+    // Manejo especial para Capricornio (cruza el año)
+    if (zodiac.sign === "Capricornio") {
+      if ((month === 12 && day >= zodiac.startDay) || (month === 1 && day <= zodiac.endDay)) {
+        return zodiac.sign;
+      }
+    } else {
+      if ((month === zodiac.startMonth && day >= zodiac.startDay) || 
+          (month === zodiac.endMonth && day <= zodiac.endDay)) {
+        return zodiac.sign;
+      }
+    }
+  }
+  
+  return "Aries"; // Default, aunque no deberíamos llegar aquí
 };
 
 // Función para obtener el icono zodiacal basado en el signo
@@ -133,35 +213,39 @@ const getPlanetIcon = (planet: string): string => {
   return planetIcons[planet] || "🪐";
 };
 
+// Función para calcular posición planetaria basada en la fecha y desplazamiento (simplificado)
+const calculatePlanetaryPosition = (birthDate: Date, offsetDays: number): string => {
+  const adjustedDate = new Date(birthDate);
+  adjustedDate.setDate(adjustedDate.getDate() + offsetDays);
+  return getZodiacSign(adjustedDate);
+};
+
 // Función para calcular las posiciones planetarias
 export const calculateNatalChart = (input: NatalChartInput): NatalChartData => {
   const { birthDate, birthTime, birthplace } = input;
 
-  // En una implementación real, usaríamos la latitud y longitud para cálculos más precisos
-  // Por ahora, solo modificamos la lógica existente para usar el nuevo tipo Location
+  // 1. Convertir hora local a UTC
+  const longitudeHours = birthplace.longitude / 15;
+  const utcTime = convertToUTC(birthDate, birthTime, longitudeHours);
   
-  // Determinar el signo solar basado en la fecha de nacimiento
+  // 2. Calcular la Hora Sidérea en Greenwich
+  const siderealTimeGreenwich = calculateSiderealTime(utcTime);
+  
+  // 3. Ajustar la Hora Sidérea según la longitud
+  const localSiderealTime = adjustSiderealTimeByLongitude(siderealTimeGreenwich, birthplace.longitude);
+  
+  // 4. Calcular el Ascendente
+  const ascendantSign = calculateAscendant(localSiderealTime, birthplace.latitude);
+  
+  // 5. Calcular posiciones planetarias (simplificadas para este ejemplo)
+  // En un sistema real, usaríamos cálculos astronómicos precisos o efemérides
   const sunSign = getZodiacSign(birthDate);
+  const moonSign = calculatePlanetaryPosition(birthDate, 2);
+  const mercurySign = calculatePlanetaryPosition(birthDate, -1);
+  const venusSign = calculatePlanetaryPosition(birthDate, 3);
+  const marsSign = calculatePlanetaryPosition(birthDate, -2);
   
-  // Simular otros signos basándose en el signo solar con algunos desplazamientos
-  // En una app real, estos serían calculados con precisión astronómica
-  const moonSign = getZodiacSign(new Date(birthDate.getFullYear(), birthDate.getMonth(), birthDate.getDate() + 2));
-  
-  // Simular un ascendente basado en la hora y ubicación (muy simplificado)
-  // En realidad, el ascendente depende de la hora y ubicación exactas
-  const timeHours = parseInt(birthTime.split(':')[0]);
-  // Usar la longitud para añadir un pequeño factor a la hora (simulado)
-  const longitudeFactor = Math.floor((birthplace.longitude + 180) / 30);
-  let ascendantIndex = (timeHours + longitudeFactor) % 12;
-  const signs = ["Aries", "Tauro", "Géminis", "Cáncer", "Leo", "Virgo", "Libra", "Escorpio", "Sagitario", "Capricornio", "Acuario", "Piscis"];
-  const ascendantSign = signs[ascendantIndex];
-  
-  // Simular posiciones de mercurio, venus y marte
-  const mercurySign = getZodiacSign(new Date(birthDate.getFullYear(), birthDate.getMonth(), birthDate.getDate() - 1));
-  const venusSign = getZodiacSign(new Date(birthDate.getFullYear(), birthDate.getMonth(), birthDate.getDate() + 3));
-  const marsSign = getZodiacSign(new Date(birthDate.getFullYear(), birthDate.getMonth(), birthDate.getDate() - 2));
-  
-  // Crear objeto de datos de la carta natal
+  // 6. Crear objeto de datos de la carta natal
   return {
     sun: {
       planet: "Sol",
