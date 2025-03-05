@@ -56,7 +56,7 @@ const BackgroundImage: React.FC<BackgroundImageProps> = ({
               backgroundSize: 'cover',
             }} 
           >
-            <div className="absolute inset-0 cosmos-overlay transition-all duration-300" />
+            <div className="absolute inset-0 bg-black bg-opacity-40 cosmos-overlay transition-all duration-300" />
           </div>
         </>
       )}

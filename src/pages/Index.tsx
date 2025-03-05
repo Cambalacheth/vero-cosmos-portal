@@ -13,7 +13,10 @@ const Index = () => {
   }, []);
 
   return (
-    <BackgroundImage backgroundImageUrl="https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&q=80">
+    <BackgroundImage 
+      backgroundImageUrl="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&q=80"
+      usePlainBackground={false}
+    >
       <div className="min-h-screen flex flex-col items-center justify-center px-4 py-10">
         <div 
           className={`w-full max-w-md mx-auto text-center transition-all duration-1000 delay-300 transform
