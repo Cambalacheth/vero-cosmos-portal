@@ -1,69 +1,92 @@
-# Welcome to your Lovable project
 
-## Project info
+# Vero Cosmos - Tu Portal Astrológico Personal
 
-**URL**: https://lovable.dev/projects/38690756-01ce-46b9-9222-37d4624b572c
+Bienvenido a Vero Cosmos, tu aplicación web para explorar el universo astrológico y descubrir las conexiones cósmicas que influyen en tu vida.
 
-## How can I edit this code?
+## 📱 Aplicación en funcionamiento
 
-There are several ways of editing your application.
+Vero Cosmos es una aplicación web responsive diseñada para ofrecer una experiencia astrológica personalizada. Disponible en cualquier dispositivo, permitiéndote acceder a tu información cósmica en todo momento y lugar.
 
-**Use Lovable**
+## 🌟 Características Actuales
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/38690756-01ce-46b9-9222-37d4624b572c) and start prompting.
+### 🏠 Home - Tu Portal Cósmico
+- **Carta Natal Personalizada**: Genera tu carta natal introduciendo tu fecha, hora y lugar de nacimiento.
+- **Visualización de Carta Natal**: Representación visual interactiva de tu carta natal con las posiciones planetarias.
+- **Tarot Diario**: Obtén una carta de tarot diaria con su interpretación personalizada.
+- **Horóscopo Personalizado**: Recibe predicciones basadas en tu carta natal y las posiciones planetarias actuales.
+- **Widget de Posiciones Celestes**: Consulta las posiciones actuales de los planetas en el zodiaco.
 
-Changes made via Lovable will be committed automatically to this repo.
+### 📅 Calendario Astrológico
+- **Vista de eventos astrológicos**: Visualiza fases lunares, tránsitos planetarios y cambios zodiacales.
+- **Alertas personalizadas**: Recibe notificaciones sobre eventos importantes según tu carta natal.
 
-**Use your preferred IDE**
+### 🔮 Tarot
+- **Lecturas de Tarot**: Realiza diferentes tipos de tiradas (diaria, tres cartas, cruz celta).
+- **Interpretaciones detalladas**: Cada carta viene con su significado, tanto en posición normal como invertida.
+- **Guardado de lecturas**: Almacena tus lecturas para consultarlas posteriormente.
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### 👤 Perfil
+- **Datos personales**: Almacena y gestiona tu información de nacimiento para cálculos astrológicos.
+- **Lecturas guardadas**: Accede a tu historial de lecturas de tarot guardadas.
+- **Configuración de preferencias**: Personaliza las notificaciones y otros aspectos de la aplicación.
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## 🧪 Tecnologías Utilizadas
 
-Follow these steps:
+- **Frontend**: React, TypeScript, Tailwind CSS, shadcn/ui
+- **Estado y fetching**: React Query
+- **Enrutamiento**: React Router
+- **Estilizado**: Diseño responsivo con Tailwind y animaciones personalizadas
+- **Iconografía**: Lucide React
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## 🛣️ Roadmap - Próximas Funcionalidades
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+### Corto plazo (1-3 meses)
+- **Autenticación de usuarios**: Implementación de registro e inicio de sesión.
+- **Sincronización en la nube**: Guardar carta natal y lecturas en servidor.
+- **Compatibilidad astrológica**: Análisis de compatibilidad entre dos cartas natales.
+- **Progresiones y tránsitos**: Cálculos avanzados de progresiones y análisis de tránsitos.
 
-# Step 3: Install the necessary dependencies.
-npm i
+### Mediano plazo (3-6 meses)
+- **Notificaciones push**: Alertas sobre eventos astrológicos importantes.
+- **Análisis detallado de casas**: Incorporación completa del sistema de casas en la carta natal.
+- **Rituales personalizados**: Recomendaciones de rituales basados en fases lunares y tránsitos.
+- **Comunidad social**: Funciones para compartir lecturas y conectar con otros usuarios.
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+### Largo plazo (6-12 meses)
+- **Astrología predictiva**: Herramientas avanzadas de predicción.
+- **Integración con calendario personal**: Sincronización con Google Calendar/iCal.
+- **Educación astrológica**: Sección de aprendizaje con cursos y material didáctico.
+- **Consultas con astrólogos profesionales**: Marketplace para conectar con expertos.
+- **Aplicación móvil nativa**: Versiones para iOS y Android.
 
-**Edit a file directly in GitHub**
+## 🚀 Cómo comenzar
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+Para iniciar tu viaje cósmico:
 
-**Use GitHub Codespaces**
+1. Visita la página principal 
+2. Navega a la sección "Carta Natal" en el Home
+3. Introduce tus datos de nacimiento (fecha, hora y lugar)
+4. ¡Explora tus conexiones cósmicas personalizadas!
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## 🤝 Contribuir
 
-## What technologies are used for this project?
+Si deseas contribuir a este proyecto, por favor:
 
-This project is built with .
+1. Haz fork del repositorio
+2. Crea una rama para tu función (`git checkout -b feature/amazing-feature`)
+3. Realiza tus cambios y haz commit (`git commit -m 'Add some amazing feature'`)
+4. Push a la rama (`git push origin feature/amazing-feature`)
+5. Abre un Pull Request
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## 📄 Licencia
 
-## How can I deploy this project?
+Este proyecto está licenciado bajo la Licencia MIT - ver el archivo LICENSE para más detalles.
 
-Simply open [Lovable](https://lovable.dev/projects/38690756-01ce-46b9-9222-37d4624b572c) and click on Share -> Publish.
+## 💫 Agradecimientos
 
-## I want to use a custom domain - is that possible?
+- A los astros por su constante influencia y guía
+- A la comunidad astrológica por compartir su conocimiento ancestral
+- A los desarrolladores de las bibliotecas y herramientas utilizadas en este proyecto
 
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+---
+⭐ **Creado con amor y alineado con las estrellas** ⭐
