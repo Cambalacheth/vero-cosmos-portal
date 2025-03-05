@@ -1,5 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
+import { useTheme } from '@/contexts/ThemeContext';
+import { cn } from '@/lib/utils';
 
 interface BackgroundImageProps {
   children: React.ReactNode;
@@ -15,6 +17,7 @@ const BackgroundImage: React.FC<BackgroundImageProps> = ({
   usePlainBackground = false
 }) => {
   const [loaded, setLoaded] = useState(false);
+  const { theme } = useTheme();
   
   useEffect(() => {
     if (usePlainBackground) {
@@ -28,23 +31,32 @@ const BackgroundImage: React.FC<BackgroundImageProps> = ({
   }, [backgroundImageUrl, usePlainBackground]);
 
   return (
-    <div className={`relative ${fullHeight ? 'min-h-screen' : 'min-h-[calc(100vh-64px)]'} w-full overflow-hidden`}>
+    <div className={cn(
+      "relative w-full overflow-hidden transition-colors duration-300",
+      fullHeight ? 'min-h-screen' : 'min-h-[calc(100vh-64px)]'
+    )}>
       {usePlainBackground ? (
-        <div className="absolute inset-0 bg-gradient-to-b from-cosmos-lavender to-white" />
+        <div className="absolute inset-0 bg-gradient-to-b from-background to-card transition-colors duration-300" />
       ) : (
         <>
           <div 
-            className={`absolute inset-0 bg-cosmos-lavender transition-opacity duration-1000 ease-in-out ${loaded ? 'opacity-0' : 'opacity-100'}`}
+            className={cn(
+              "absolute inset-0 bg-background transition-all duration-1000 ease-in-out",
+              loaded ? 'opacity-0' : 'opacity-100'
+            )}
           />
           <div 
-            className={`absolute inset-0 bg-cover bg-center bg-no-repeat transition-opacity duration-1000 ease-in-out ${loaded ? 'opacity-100' : 'opacity-0'}`}
+            className={cn(
+              "absolute inset-0 bg-cover bg-center bg-no-repeat transition-opacity duration-1000 ease-in-out",
+              loaded ? 'opacity-100' : 'opacity-0'
+            )}
             style={{ 
               backgroundImage: `url("${backgroundImageUrl}")`,
               backgroundPosition: 'center',
               backgroundSize: 'cover',
             }} 
           >
-            <div className="absolute inset-0 cosmos-overlay" />
+            <div className="absolute inset-0 cosmos-overlay transition-all duration-300" />
           </div>
         </>
       )}
