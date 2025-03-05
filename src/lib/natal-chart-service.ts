@@ -6,26 +6,26 @@ import {
   calculateNatalChart,
   generatePersonalizedHoroscope,
   searchLocations,
-  LOCATIONS,
-  Location
+  LOCATIONS
 } from './natal-chart';
 
 import type {
   NatalChartInput,
   NatalChartData,
-  PlanetaryPosition
+  PlanetaryPosition,
+  Location
 } from './natal-chart';
 
 export {
   calculateNatalChart,
   generatePersonalizedHoroscope,
   searchLocations,
-  LOCATIONS,
-  Location
+  LOCATIONS
 };
 
 export type {
   NatalChartInput,
   NatalChartData,
-  PlanetaryPosition
+  PlanetaryPosition,
+  Location
 };

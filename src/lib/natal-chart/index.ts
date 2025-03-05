@@ -1,4 +1,3 @@
-
 import { NatalChartInput, NatalChartData, PlanetaryPosition, Location } from './types';
 import { convertToUTC, calculateSiderealTime, adjustSiderealTimeByLongitude, calculateAscendant, calculatePlanetaryPosition } from './astronomical-calculations';
 import { getZodiacSign, getPlanetIcon } from './zodiac-data';
@@ -75,14 +74,13 @@ export const calculateNatalChart = (input: NatalChartInput): NatalChartData => {
 export { 
   generatePersonalizedHoroscope,
   searchLocations,
-  LOCATIONS,
-  // Tipos
-  Location
+  LOCATIONS
 };
 
 // Re-exportar tipos con la sintaxis correcta
 export type { 
   NatalChartInput,
   NatalChartData,
-  PlanetaryPosition
+  PlanetaryPosition,
+  Location
 };
