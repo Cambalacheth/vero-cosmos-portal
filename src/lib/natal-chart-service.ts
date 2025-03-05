@@ -7,6 +7,10 @@ import {
   generatePersonalizedHoroscope,
   searchLocations,
   LOCATIONS,
+  Location
+} from './natal-chart';
+
+import type {
   NatalChartInput,
   NatalChartData,
   PlanetaryPosition
@@ -17,6 +21,10 @@ export {
   generatePersonalizedHoroscope,
   searchLocations,
   LOCATIONS,
+  Location
+};
+
+export type {
   NatalChartInput,
   NatalChartData,
   PlanetaryPosition

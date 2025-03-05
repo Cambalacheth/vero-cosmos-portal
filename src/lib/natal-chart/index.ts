@@ -1,5 +1,5 @@
 
-import { NatalChartInput, NatalChartData, PlanetaryPosition } from './types';
+import { NatalChartInput, NatalChartData, PlanetaryPosition, Location } from './types';
 import { convertToUTC, calculateSiderealTime, adjustSiderealTimeByLongitude, calculateAscendant, calculatePlanetaryPosition } from './astronomical-calculations';
 import { getZodiacSign, getPlanetIcon } from './zodiac-data';
 import { generatePersonalizedHoroscope } from './horoscope-generator';
@@ -77,6 +77,11 @@ export {
   searchLocations,
   LOCATIONS,
   // Tipos
+  Location
+};
+
+// Re-exportar tipos con la sintaxis correcta
+export type { 
   NatalChartInput,
   NatalChartData,
   PlanetaryPosition
