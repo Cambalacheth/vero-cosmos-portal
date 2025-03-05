@@ -1,5 +1,7 @@
+
 import React, { useState, useEffect } from 'react';
 import { UserRound } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import BackgroundImage from '../components/BackgroundImage';
 import NavBar from '../components/NavBar';
 
@@ -86,9 +88,11 @@ const Profile = () => {
             <div className="glass-card p-4 mb-6 rounded-xl bg-gradient-to-r from-cosmos-gold/20 to-cosmos-darkGold/20">
               <h3 className="text-xl font-playfair text-cosmos-darkGold mb-3">Vero Cosmos Premium</h3>
               <p className="text-sm mb-3">Desbloquea lecturas personalizadas, análisis de compatibilidad y más funciones exclusivas.</p>
-              <button className="w-full button-effect px-4 py-2 bg-cosmos-darkGold/40 rounded-lg text-white border border-cosmos-gold/50 mt-2">
-                Conocer Más
-              </button>
+              <Link to="/premium">
+                <button className="w-full button-effect px-4 py-2 bg-cosmos-darkGold/40 rounded-lg text-white border border-cosmos-gold/50 mt-2">
+                  Conocer Más
+                </button>
+              </Link>
             </div>
           </div>
         </div>

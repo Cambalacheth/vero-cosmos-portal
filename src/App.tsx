@@ -10,6 +10,7 @@ import Home from "./pages/Home";
 import Calendar from "./pages/Calendar";
 import Tarot from "./pages/Tarot";
 import Profile from "./pages/Profile";
+import Premium from "./pages/Premium";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -28,6 +29,7 @@ const App = () => (
             <Route path="/tarot" element={<Tarot />} />
             <Route path="/aprender" element={<Home />} />
             <Route path="/perfil" element={<Profile />} />
+            <Route path="/premium" element={<Premium />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
