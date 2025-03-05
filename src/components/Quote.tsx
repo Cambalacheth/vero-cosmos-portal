@@ -43,7 +43,7 @@ const Quote: React.FC = () => {
   return (
     <div className="relative h-16 sm:h-20 flex items-center justify-center overflow-hidden px-6">
       <p 
-        className={`text-center text-sm sm:text-base md:text-lg italic font-nunito text-white font-medium
+        className={`text-center text-sm sm:text-base md:text-lg italic font-nunito text-cosmos-darkGold font-bold
                     transition-all duration-500 ease-in-out
                     ${isChanging ? 'opacity-0 transform -translate-y-4' : 'opacity-100 transform translate-y-0'}`}
       >

@@ -30,13 +30,19 @@ Vero Cosmos es una aplicación web responsive diseñada para ofrecer una experie
 - **Lecturas guardadas**: Accede a tu historial de lecturas de tarot guardadas.
 - **Configuración de preferencias**: Personaliza las notificaciones y otros aspectos de la aplicación.
 
-## 🧪 Tecnologías Utilizadas
+## 💎 Contenido Premium
 
-- **Frontend**: React, TypeScript, Tailwind CSS, shadcn/ui
-- **Estado y fetching**: React Query
-- **Enrutamiento**: React Router
-- **Estilizado**: Diseño responsivo con Tailwind y animaciones personalizadas
-- **Iconografía**: Lucide React
+### Características Exclusivas
+- **Carta Natal Comparativa**: Compara tu carta natal con la de otra persona para descubrir vuestra compatibilidad astrológica.
+- **Centro de Aprendizaje Avanzado**: Accede a contenido educativo exclusivo sobre astrología avanzada.
+- **Temporizador de Meditación**: Meditaciones guiadas basadas en las influencias astrológicas actuales.
+- **Diario Astrológico**: Lleva un registro de tus estados de ánimo correlacionados con eventos celestes.
+- **Análisis AI Personalizados**: Interpretaciones más detalladas y personalizadas de tránsitos planetarios.
+- **Experiencia Sin Anuncios**: Disfruta de una experiencia sin interrupciones publicitarias.
+
+### Planes de Suscripción
+- **Plan Mensual**: $9.99/mes
+- **Plan Anual**: $95.90/año (equivalente a $7.99/mes)
 
 ## 🛣️ Roadmap - Próximas Funcionalidades
 
