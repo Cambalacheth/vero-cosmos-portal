@@ -14,7 +14,7 @@ const Index = () => {
 
   return (
     <BackgroundImage 
-      backgroundImageUrl="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&q=80"
+      backgroundImageUrl="https://images.unsplash.com/photo-1492321936769-b49830bc1d1e?auto=format&fit=crop&q=80"
       usePlainBackground={false}
     >
       <div className="min-h-screen flex flex-col items-center justify-center px-4 py-10">
@@ -28,7 +28,7 @@ const Index = () => {
             <Sun className="h-5 w-5 text-cosmos-gold" />
           </div>
           
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-playfair font-semibold tracking-tight mb-2 text-white text-shadow-lg">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-playfair font-semibold tracking-tight mb-2 text-cosmos-darkGold text-shadow-lg">
             Vero Cosmos
           </h1>
           
@@ -39,7 +39,7 @@ const Index = () => {
               <button 
                 className="button-effect group relative px-8 py-3 glass-card border-cosmos-pink border overflow-hidden rounded-full"
               >
-                <span className="relative z-10 font-medium text-white group-hover:text-white transition-colors duration-300">
+                <span className="relative z-10 font-medium text-cosmos-darkGold group-hover:text-white transition-colors duration-300">
                   Conoce tu Destino
                 </span>
                 <div className="absolute inset-0 bg-gradient-to-r from-cosmos-gold to-cosmos-darkGold opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-full"></div>

@@ -13,7 +13,7 @@ interface BackgroundImageProps {
 const BackgroundImage: React.FC<BackgroundImageProps> = ({ 
   children, 
   fullHeight = true, 
-  backgroundImageUrl = "https://images.unsplash.com/photo-1470813740244-df37b8c1edcb?auto=format&fit=crop&q=80",
+  backgroundImageUrl = "https://images.unsplash.com/photo-1492321936769-b49830bc1d1e?auto=format&fit=crop&q=80",
   usePlainBackground = false
 }) => {
   const [loaded, setLoaded] = useState(false);
