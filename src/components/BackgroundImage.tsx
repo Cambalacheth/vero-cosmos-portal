@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { cn } from '@/lib/utils';
 
@@ -17,6 +17,8 @@ const BackgroundImage: React.FC<BackgroundImageProps> = ({
   usePlainBackground = false
 }) => {
   const [loaded, setLoaded] = useState(false);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const backgroundRef = useRef<HTMLDivElement>(null);
   const { theme } = useTheme();
   
   useEffect(() => {
@@ -30,11 +32,31 @@ const BackgroundImage: React.FC<BackgroundImageProps> = ({
     img.onload = () => setLoaded(true);
   }, [backgroundImageUrl, usePlainBackground]);
 
+  useEffect(() => {
+    if (usePlainBackground) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!backgroundRef.current) return;
+      
+      // Calculate mouse position relative to the center of the screen
+      const x = (e.clientX / window.innerWidth - 0.5) * 20;
+      const y = (e.clientY / window.innerHeight - 0.5) * 20;
+      
+      setPosition({ x, y });
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, [usePlainBackground]);
+
   return (
-    <div className={cn(
-      "relative w-full overflow-hidden transition-colors duration-300",
-      fullHeight ? 'min-h-screen' : 'min-h-[calc(100vh-64px)]'
-    )}>
+    <div 
+      className={cn(
+        "relative w-full overflow-hidden transition-colors duration-300",
+        fullHeight ? 'min-h-screen' : 'min-h-[calc(100vh-64px)]'
+      )}
+      ref={backgroundRef}
+    >
       {usePlainBackground ? (
         <div className="absolute inset-0 bg-gradient-to-b from-background to-card transition-colors duration-300" />
       ) : (
@@ -54,6 +76,8 @@ const BackgroundImage: React.FC<BackgroundImageProps> = ({
               backgroundImage: `url("${backgroundImageUrl}")`,
               backgroundPosition: 'center',
               backgroundSize: 'cover',
+              transform: `translate(${position.x}px, ${position.y}px) scale(1.1)`,
+              transition: 'transform 0.2s ease-out',
             }} 
           >
             <div className="absolute inset-0 bg-black bg-opacity-40 cosmos-overlay transition-all duration-300" />

@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import { Sparkles } from 'lucide-react';
 
 const quotes = [
   "Lo que buscás afuera, ya está escrito en tus estrellas.",
@@ -42,13 +43,19 @@ const Quote: React.FC = () => {
   
   return (
     <div className="relative h-16 sm:h-20 flex items-center justify-center overflow-hidden px-6">
+      <div className="absolute top-0 left-1/2 -translate-x-1/2">
+        <Sparkles className="h-4 w-4 text-cosmos-gold opacity-70" />
+      </div>
       <p 
         className={`text-center text-sm sm:text-base md:text-lg italic font-nunito text-cosmos-darkGold font-bold
-                    transition-all duration-500 ease-in-out
+                    transition-all duration-500 ease-in-out glass-card px-4 py-2 rounded-lg
                     ${isChanging ? 'opacity-0 transform -translate-y-4' : 'opacity-100 transform translate-y-0'}`}
       >
         &ldquo;{quotes[currentQuoteIndex]}&rdquo;
       </p>
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2">
+        <Sparkles className="h-4 w-4 text-cosmos-gold opacity-70" />
+      </div>
     </div>
   );
 };
