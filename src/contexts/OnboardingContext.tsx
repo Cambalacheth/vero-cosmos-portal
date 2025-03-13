@@ -31,6 +31,8 @@ type OnboardingContextType = {
   goToPreviousStep: () => void;
   goToStep: (step: number) => void;
   totalSteps: number;
+  isCompleted: boolean;
+  setCompleted: (completed: boolean) => void;
 };
 
 const defaultData: OnboardingData = {
@@ -50,6 +52,7 @@ const OnboardingContext = createContext<OnboardingContextType | undefined>(undef
 export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [data, setData] = useState<OnboardingData>(defaultData);
   const [currentStep, setCurrentStep] = useState(1);
+  const [isCompleted, setCompleted] = useState(false);
   const totalSteps = 5;
 
   const updateData = (newData: Partial<OnboardingData>) => {
@@ -59,6 +62,10 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const goToNextStep = () => {
     if (currentStep < totalSteps) {
       setCurrentStep(currentStep + 1);
+    } else if (currentStep === totalSteps) {
+      // If we're at the last step and going next, mark as completed and show verification screen
+      setCurrentStep(totalSteps + 1);
+      setCompleted(true);
     }
   };
 
@@ -82,7 +89,9 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       goToNextStep,
       goToPreviousStep,
       goToStep,
-      totalSteps
+      totalSteps,
+      isCompleted,
+      setCompleted
     }}>
       {children}
     </OnboardingContext.Provider>

@@ -41,7 +41,7 @@ const Auth = () => {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session) {
-        navigate('/onboarding');
+        navigate('/home');
       }
     });
 
@@ -78,7 +78,7 @@ const Auth = () => {
         
         navigate('/home');
       } else {
-        // Sign up
+        // Sign up - Changed to direct to onboarding without waiting for verification
         const { error } = await supabase.auth.signUp({
           email,
           password,
@@ -86,13 +86,16 @@ const Auth = () => {
 
         if (error) throw error;
         
+        // Store user email in localStorage for the onboarding process
+        localStorage.setItem('pendingVerificationEmail', email);
+        
         toast({
           title: "Registro exitoso",
-          description: "Por favor, verifica tu correo electrónico para continuar",
+          description: "Comencemos con tu experiencia personalizada",
         });
         
-        // Redirect to a verification page or show a message
-        navigate('/auth/verify', { state: { email } });
+        // Start onboarding immediately instead of redirecting to verification page
+        navigate('/onboarding');
       }
     } catch (error: any) {
       console.error('Authentication error:', error);
@@ -130,7 +133,7 @@ const Auth = () => {
     <div className="relative min-h-screen w-full overflow-hidden">
       <StarryBackground />
       <BackgroundImage 
-        backgroundImageUrl="https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1413&q=80"
+        backgroundImageUrl="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
         usePlainBackground={false}
       >
         <div className="min-h-screen flex flex-col items-center justify-center px-4 py-10 relative z-10">
@@ -144,14 +147,16 @@ const Auth = () => {
               <Star className="h-6 w-6 text-cosmos-gold animate-twinkle" />
             </div>
             
-            <h1 className="text-4xl sm:text-5xl font-playfair font-semibold tracking-tight mb-2 text-cosmos-darkGold text-shadow-lg">
-              Vero Cosmos
-            </h1>
+            <div className="bg-black/30 backdrop-blur-sm py-4 px-2 rounded-lg mb-5">
+              <h1 className="text-4xl sm:text-5xl font-playfair font-semibold tracking-tight mb-2 text-white text-shadow-lg">
+                Vero Cosmos
+              </h1>
+            </div>
             
             <div className="h-px w-32 mx-auto bg-gradient-to-r from-transparent via-cosmos-gold to-transparent my-5" />
             
-            <div className="glass-card p-6 rounded-xl">
-              <h2 className="text-2xl font-playfair mb-4 text-cosmos-darkGold">
+            <div className="glass-card p-6 rounded-xl bg-black/50 backdrop-blur-md">
+              <h2 className="text-2xl font-playfair mb-4 text-white">
                 {isLoginMode ? 'Inicia tu viaje cósmico' : 'Únete al universo'}
               </h2>
               
@@ -165,26 +170,26 @@ const Auth = () => {
               <form onSubmit={handleAuth} className="space-y-4">
                 <div className="space-y-2">
                   <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-cosmos-darkGold opacity-70" />
+                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-white opacity-70" />
                     <Input
                       type="email"
                       placeholder="Correo electrónico"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
-                      className="pl-10 bg-white/30 border-cosmos-gold/30"
+                      className="pl-10 bg-white/10 border-cosmos-gold/30 text-white"
                     />
                   </div>
                   
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-cosmos-darkGold opacity-70" />
+                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-white opacity-70" />
                     <Input
                       type="password"
                       placeholder="Contraseña"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
-                      className="pl-10 bg-white/30 border-cosmos-gold/30"
+                      className="pl-10 bg-white/10 border-cosmos-gold/30 text-white"
                     />
                   </div>
                 </div>
@@ -197,7 +202,7 @@ const Auth = () => {
                       onCheckedChange={(checked) => setRememberMe(checked === true)}
                       className="border-cosmos-gold/50 data-[state=checked]:bg-cosmos-gold/70"
                     />
-                    <Label htmlFor="rememberMe" className="text-sm text-cosmos-darkGold">
+                    <Label htmlFor="rememberMe" className="text-sm text-white">
                       Recordar mis datos
                     </Label>
                   </div>
@@ -206,11 +211,11 @@ const Auth = () => {
                 <Button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full button-effect glass-card bg-cosmos-gold/20 hover:bg-cosmos-gold/40 text-cosmos-darkGold border border-cosmos-gold/30"
+                  className="w-full button-effect glass-card bg-cosmos-gold/20 hover:bg-cosmos-gold/40 text-white border border-cosmos-gold/30"
                 >
                   {isLoading ? (
                     <span className="flex items-center">
-                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-cosmos-darkGold" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                       </svg>
@@ -233,7 +238,7 @@ const Auth = () => {
               <div className="mt-4">
                 <button 
                   onClick={toggleMode} 
-                  className="text-sm text-cosmos-darkGold hover:underline transition-all"
+                  className="text-sm text-white hover:underline transition-all"
                 >
                   {isLoginMode 
                     ? '¿No tienes una cuenta? Regístrate aquí' 
