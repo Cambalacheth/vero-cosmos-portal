@@ -1,93 +1,93 @@
 
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import BackgroundImage from '../components/BackgroundImage';
-import NavBar from '../components/NavBar';
-import Quote from '../components/Quote';
-import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import StarryBackground from '../components/StarryBackground';
+import { useAuth } from '../contexts/AuthContext';
+import CelestialHeader from '../components/auth/CelestialHeader';
+import { Button } from '@/components/ui/button';
 
 const Index = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [loaded, setLoaded] = useState(false);
-  const { session } = useAuth();
 
   useEffect(() => {
-    setLoaded(true);
+    const timer = setTimeout(() => {
+      setLoaded(true);
+    }, 200);
+    return () => clearTimeout(timer);
   }, []);
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <BackgroundImage fullHeight={true}>
-        <div className="landing-overlay"></div>
-        <div className="landing-content container mx-auto px-4 flex flex-col min-h-screen pb-20">
-          <div 
-            className={`flex-1 flex flex-col justify-center items-center text-center transition-all duration-1000 delay-300 transform
-                     ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+    <div className="min-h-screen flex flex-col text-white">
+      <StarryBackground>
+        <div className="container mx-auto px-4 py-16 flex-1 flex flex-col items-center justify-center text-center">
+          <div
+            className={`transition-opacity duration-1000 ${
+              loaded ? 'opacity-100' : 'opacity-0'
+            }`}
           >
-            <h1 className="landing-title font-playfair text-white mb-4">
-              Descubre los Misterios de tu Destino
+            <CelestialHeader />
+            
+            <h1 className="text-4xl md:text-5xl font-playfair mt-8 font-bold tracking-tight clip-text">
+              Vero Cosmos
             </h1>
-            <h2 className="landing-subtitle text-white mb-8">
-              Conecta con las estrellas a través de cartas astrales, lecturas de tarot y rituales personalizados
-            </h2>
             
-            {!session ? (
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Link to="/auth" className="landing-button hover:bg-cosmos-darkGold/90">
-                  Comenzar mi Viaje
-                </Link>
-                <a href="#features" className="landing-button bg-transparent hover:bg-white/20">
-                  Explorar
-                </a>
-              </div>
-            ) : (
-              <Link to="/home" className="landing-button hover:bg-cosmos-darkGold/90">
-                Continuar mi Viaje
-              </Link>
-            )}
+            <p className="mt-6 text-lg md:text-xl max-w-2xl mx-auto">
+              Descubre los secretos del universo y tu conexión con las estrellas
+            </p>
             
-            <Quote className="mt-12 max-w-xl" />
-          </div>
-          
-          <div id="features" className="py-16">
-            <h2 className="text-3xl font-playfair text-white text-center mb-12 landing-subtitle">
-              Tu Portal hacia lo Místico
-            </h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="feature-card">
-                <div className="text-4xl mb-4 text-center">♈</div>
-                <h3 className="feature-title text-center">Carta Natal Personalizada</h3>
-                <p className="feature-description">
-                  Descubre lo que los astros revelan sobre tu personalidad, fortalezas y desafíos con una carta astral precisa basada en tu fecha, hora y lugar de nacimiento.
-                </p>
-              </div>
-              
-              <div className="feature-card">
-                <div className="text-4xl mb-4 text-center">🔮</div>
-                <h3 className="feature-title text-center">Lecturas de Tarot Diarias</h3>
-                <p className="feature-description">
-                  Recibe orientación diaria con lecturas de tarot personalizadas que te ayudarán a navegar los desafíos y oportunidades de cada día.
-                </p>
-              </div>
-              
-              <div className="feature-card">
-                <div className="text-4xl mb-4 text-center">✨</div>
-                <h3 className="feature-title text-center">Rituales para Luna Nueva</h3>
-                <p className="feature-description">
-                  Transforma tu energía y manifiesta tus deseos con rituales personalizados alineados con los ciclos lunares y tu carta astral.
-                </p>
-              </div>
+            <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+              {user ? (
+                <Button
+                  onClick={() => navigate('/home')}
+                  className="button-effect px-6 py-3 bg-cosmos-darkGold/60 rounded-lg text-white border border-cosmos-gold/50 hover:bg-cosmos-darkGold/80"
+                >
+                  Ir a mi Perfil
+                </Button>
+              ) : (
+                <>
+                  <Button
+                    onClick={() => navigate('/auth?mode=login')}
+                    className="button-effect px-6 py-3 bg-cosmos-darkGold/60 rounded-lg text-white border border-cosmos-gold/50 hover:bg-cosmos-darkGold/80"
+                  >
+                    Iniciar Sesión
+                  </Button>
+                  <Button
+                    onClick={() => navigate('/auth?mode=register')}
+                    className="button-effect px-6 py-3 bg-white/20 rounded-lg backdrop-blur-sm border border-white/30 hover:bg-white/30 text-white"
+                  >
+                    Registrarse
+                  </Button>
+                </>
+              )}
             </div>
             
-            <div className="text-center mt-16">
-              <Link to={session ? "/home" : "/auth"} className="landing-button hover:bg-cosmos-darkGold/90">
-                {session ? "Ir a Mi Portal" : "Comenzar Ahora"}
-              </Link>
+            <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="glass-card p-6 rounded-xl backdrop-blur-sm bg-white/10 border border-white/20">
+                <h3 className="text-xl font-playfair mb-3 text-cosmos-gold">Carta Natal Personalizada</h3>
+                <p className="text-sm opacity-80">
+                  Descubre cómo los planetas influenciaron tu vida desde el momento de tu nacimiento con nuestra detallada carta natal.
+                </p>
+              </div>
+              
+              <div className="glass-card p-6 rounded-xl backdrop-blur-sm bg-white/10 border border-white/20">
+                <h3 className="text-xl font-playfair mb-3 text-cosmos-gold">Predicciones Diarias</h3>
+                <p className="text-sm opacity-80">
+                  Recibe orientación diaria basada en los movimientos celestes y cómo estos afectan específicamente a tu signo y ascendente.
+                </p>
+              </div>
+              
+              <div className="glass-card p-6 rounded-xl backdrop-blur-sm bg-white/10 border border-white/20">
+                <h3 className="text-xl font-playfair mb-3 text-cosmos-gold">Lecturas de Tarot</h3>
+                <p className="text-sm opacity-80">
+                  Accede a tiradas de tarot personalizadas que te ayudarán a reflexionar sobre tu presente y visualizar posibles futuros.
+                </p>
+              </div>
             </div>
           </div>
         </div>
-      </BackgroundImage>
-      <NavBar />
+      </StarryBackground>
     </div>
   );
 };

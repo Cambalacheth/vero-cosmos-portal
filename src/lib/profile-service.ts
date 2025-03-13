@@ -51,7 +51,8 @@ export async function getUserNatalChart(): Promise<NatalChartData | null> {
       .eq('id', user.id)
       .single();
     
-    if (error || !data || !data.natal_chart) {
+    if (error || !data) {
+      console.error('Error al obtener la carta natal:', error);
       return null;
     }
     

@@ -78,20 +78,20 @@ const Premium = () => {
             className={`w-full transition-all duration-1000 delay-300 transform
                      ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
           >
-            <h2 className="text-3xl text-center font-playfair font-semibold mb-6 clip-text">Vero Cosmos Premium</h2>
-            <p className="text-center mb-8 max-w-2xl mx-auto">Desbloquea todo el potencial de tu camino astrológico con funciones exclusivas diseñadas para profundizar tu conexión con el cosmos.</p>
+            <h2 className="text-3xl text-center font-playfair font-semibold mb-6 text-cosmos-darkGold">Vero Cosmos Premium</h2>
+            <p className="text-center mb-8 max-w-2xl mx-auto text-white text-lg">Desbloquea todo el potencial de tu camino astrológico con funciones exclusivas diseñadas para profundizar tu conexión con el cosmos.</p>
             
             {/* Pricing Toggle */}
             <div className="flex justify-center mb-8">
               <div className="glass-card p-1 rounded-full flex">
                 <button 
-                  className={`px-4 py-1.5 rounded-full text-sm flex items-center ${selectedPlan === 'monthly' ? 'bg-cosmos-pink bg-opacity-30 text-cosmos-darkGold' : 'text-gray-500'}`}
+                  className={`px-4 py-1.5 rounded-full text-sm flex items-center ${selectedPlan === 'monthly' ? 'bg-cosmos-pink bg-opacity-30 text-cosmos-darkGold' : 'text-white'}`}
                   onClick={() => setSelectedPlan('monthly')}
                 >
                   Mensual
                 </button>
                 <button 
-                  className={`px-4 py-1.5 rounded-full text-sm flex items-center ${selectedPlan === 'yearly' ? 'bg-cosmos-pink bg-opacity-30 text-cosmos-darkGold' : 'text-gray-500'}`}
+                  className={`px-4 py-1.5 rounded-full text-sm flex items-center ${selectedPlan === 'yearly' ? 'bg-cosmos-pink bg-opacity-30 text-cosmos-darkGold' : 'text-white'}`}
                   onClick={() => setSelectedPlan('yearly')}
                 >
                   Anual <span className="ml-1 text-xs bg-cosmos-darkGold text-white px-1.5 py-0.5 rounded-full">-20%</span>
@@ -106,14 +106,14 @@ const Premium = () => {
                 <div className="mt-2">
                   {selectedPlan === 'monthly' ? (
                     <div className="flex items-center justify-center">
-                      <span className="text-3xl font-bold">$9.99</span>
-                      <span className="ml-1 text-sm">/mes</span>
+                      <span className="text-3xl font-bold text-white">$9.99</span>
+                      <span className="ml-1 text-sm text-white">/mes</span>
                     </div>
                   ) : (
                     <div className="flex flex-col items-center">
                       <div className="flex items-center">
-                        <span className="text-3xl font-bold">$95.90</span>
-                        <span className="ml-1 text-sm">/año</span>
+                        <span className="text-3xl font-bold text-white">$95.90</span>
+                        <span className="ml-1 text-sm text-white">/año</span>
                       </div>
                       <span className="text-xs text-cosmos-darkGold">Equivalente a $7.99/mes</span>
                     </div>
@@ -121,7 +121,7 @@ const Premium = () => {
                 </div>
               </div>
               
-              <ul className="space-y-3 mb-6">
+              <ul className="space-y-3 mb-6 text-white">
                 {premiumFeatures.map(feature => (
                   <li key={feature.id} className="flex items-start">
                     <span className="flex-shrink-0 mt-1 text-cosmos-darkGold">✨</span>
@@ -136,7 +136,7 @@ const Premium = () => {
               >
                 Suscribirme Ahora
               </Button>
-              <p className="text-xs text-center mt-3 opacity-70">Cancela en cualquier momento. Sin compromisos.</p>
+              <p className="text-xs text-center mt-3 text-white opacity-70">Cancela en cualquier momento. Sin compromisos.</p>
             </div>
             
             {/* Features Grid */}
@@ -155,9 +155,9 @@ const Premium = () => {
                     <div className="w-10 h-10 rounded-full bg-cosmos-pink bg-opacity-20 flex items-center justify-center mr-3">
                       <feature.icon size={20} className="text-cosmos-darkGold" />
                     </div>
-                    <h3 className="text-lg font-medium">{feature.title}</h3>
+                    <h3 className="text-lg font-medium text-white">{feature.title}</h3>
                   </div>
-                  <p className="text-sm opacity-80">{feature.description}</p>
+                  <p className="text-sm text-white">{feature.description}</p>
                 </div>
               ))}
             </div>
@@ -166,22 +166,22 @@ const Premium = () => {
             <div className="glass-card p-6 rounded-xl mb-6">
               <h3 className="text-xl font-playfair text-cosmos-darkGold mb-4 text-center">Preguntas Frecuentes</h3>
               
-              <div className="space-y-4">
+              <div className="space-y-4 text-white">
                 <div>
                   <h4 className="font-medium mb-1">¿Puedo cancelar mi suscripción en cualquier momento?</h4>
-                  <p className="text-sm opacity-80">Sí, puedes cancelar tu suscripción Premium en cualquier momento. Seguirás teniendo acceso a las funciones Premium hasta el final del período de facturación.</p>
+                  <p className="text-sm">Sí, puedes cancelar tu suscripción Premium en cualquier momento. Seguirás teniendo acceso a las funciones Premium hasta el final del período de facturación.</p>
                 </div>
                 <div>
                   <h4 className="font-medium mb-1">¿Cómo funciona la carta natal comparativa?</h4>
-                  <p className="text-sm opacity-80">Nuestra herramienta de comparación analiza ambas cartas natales y proporciona un análisis detallado de compatibilidad en áreas como comunicación, valores, romance y desafíos potenciales.</p>
+                  <p className="text-sm">Nuestra herramienta de comparación analiza ambas cartas natales y proporciona un análisis detallado de compatibilidad en áreas como comunicación, valores, romance y desafíos potenciales.</p>
                 </div>
                 <div>
                   <h4 className="font-medium mb-1">¿Qué incluye el Centro de Aprendizaje Avanzado?</h4>
-                  <p className="text-sm opacity-80">Incluye tutoriales en video, artículos detallados y guías paso a paso sobre temas avanzados como progresiones secundarias, revoluciones solares y técnicas predictivas.</p>
+                  <p className="text-sm">Incluye tutoriales en video, artículos detallados y guías paso a paso sobre temas avanzados como progresiones secundarias, revoluciones solares y técnicas predictivas.</p>
                 </div>
                 <div>
                   <h4 className="font-medium mb-1">¿Las meditaciones se actualizan regularmente?</h4>
-                  <p className="text-sm opacity-80">Sí, añadimos nuevas meditaciones guiadas cada mes, sincronizadas con los tránsitos planetarios actuales y especialmente diseñadas para las fases lunares.</p>
+                  <p className="text-sm">Sí, añadimos nuevas meditaciones guiadas cada mes, sincronizadas con los tránsitos planetarios actuales y especialmente diseñadas para las fases lunares.</p>
                 </div>
               </div>
             </div>
