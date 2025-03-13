@@ -25,24 +25,37 @@ const WealthMapPreview: React.FC<WealthMapPreviewProps> = ({ natalChart, onUpgra
         </CardHeader>
         <CardContent>
           <div className="mb-6">
-            <h4 className="font-medium mb-2 text-cosmos-gold">Resumen de tu Potencial Financiero</h4>
-            <p className="text-sm">{basicAnalysis.summary}</p>
-          </div>
-          
-          <div className="mb-6">
             <h4 className="font-medium mb-2 text-cosmos-gold">Casa 2: Tu Relación con el Dinero</h4>
             <p className="text-sm">{basicAnalysis.house2Analysis}</p>
           </div>
           
-          <div>
-            <h4 className="font-medium mb-2 text-cosmos-gold">Casa 10: Tu Carrera Ideal</h4>
-            <p className="text-sm">{basicAnalysis.house10Analysis}</p>
+          <div className="mb-4 glass-card p-3 rounded-lg flex items-center space-x-2">
+            <Lock className="w-4 h-4 text-cosmos-darkGold" />
+            <div>
+              <h4 className="font-medium text-sm text-cosmos-darkGold">Casa 10: Tu Carrera Ideal</h4>
+              <p className="text-xs text-gray-500">Contenido premium</p>
+            </div>
+          </div>
+          
+          <div className="mb-4 glass-card p-3 rounded-lg flex items-center space-x-2">
+            <Lock className="w-4 h-4 text-cosmos-darkGold" />
+            <div>
+              <h4 className="font-medium text-sm text-cosmos-darkGold">Júpiter & Saturno</h4>
+              <p className="text-xs text-gray-500">Contenido premium</p>
+            </div>
+          </div>
+          
+          <div className="glass-card p-3 rounded-lg flex items-center space-x-2">
+            <Lock className="w-4 h-4 text-cosmos-darkGold" />
+            <div>
+              <h4 className="font-medium text-sm text-cosmos-darkGold">Casas 8 y 11</h4>
+              <p className="text-xs text-gray-500">Contenido premium</p>
+            </div>
           </div>
         </CardContent>
         <CardFooter className="flex flex-col">
-          <div className="w-full glass-card p-3 rounded-lg mb-4 flex items-center">
-            <Lock className="w-4 h-4 text-cosmos-darkGold mr-2" />
-            <p className="text-xs">
+          <div className="w-full glass-card p-3 rounded-lg mb-4">
+            <p className="text-xs text-center">
               Desbloquea el análisis completo con consejos específicos para manifestar abundancia, 
               calendario financiero personalizado y mucho más.
             </p>
