@@ -11,10 +11,18 @@ export type DrawnCard = {
     meaningUpright: string[];
     meaningReversed: string[];
     description: string;
-    image: string;
+    imageUrl: string; // Changed from image to imageUrl to match tarot-data.ts
   };
   position?: number;
   isReversed: boolean;
+};
+
+export type SavedReading = {
+  id: string;
+  readingType: string;
+  cards: DrawnCard[];
+  created_at: string;
+  notes?: string;
 };
 
 // Function to save a tarot reading for today
@@ -30,13 +38,19 @@ export const saveTarotReading = async (drawnCard: DrawnCard): Promise<boolean> =
     today.setHours(0, 0, 0, 0);
 
     // Check if there's already a reading for today
-    const { data: existingReading } = await supabase
+    const { data: existingReading, error: checkError } = await supabase
       .from('tarot_readings')
       .select('*')
       .eq('user_id', user.id)
+      .eq('reading_type', 'daily')
       .gte('created_at', today.toISOString())
       .lt('created_at', new Date(today.getTime() + 86400000).toISOString())
       .single();
+
+    if (checkError && checkError.code !== 'PGRST116') {
+      console.error('Error checking existing reading:', checkError);
+      return false;
+    }
 
     if (existingReading) {
       // Already have a reading for today, just return
@@ -87,20 +101,63 @@ export const getTodaysTarotReading = async (): Promise<DrawnCard | null> => {
       .limit(1)
       .single();
 
-    if (error || !data) {
+    if (error) {
       // No reading found for today, which is expected behavior
       return null;
     }
 
-    return data.cards[0] as DrawnCard;
+    if (data && data.cards && Array.isArray(data.cards) && data.cards.length > 0) {
+      return data.cards[0] as DrawnCard;
+    }
+
+    return null;
   } catch (error) {
     console.error('Error getting today\'s tarot reading:', error);
     return null;
   }
 };
 
+// Function to save a full reading (multiple cards)
+export const saveReading = (reading: {
+  readingType: { id: string; name: string; description: string; cardCount: number };
+  deck: { id: string; name: string; description: string };
+  cards: DrawnCard[];
+}): SavedReading | null => {
+  try {
+    const id = crypto.randomUUID();
+    const savedReading: SavedReading = {
+      id,
+      readingType: reading.readingType.id,
+      cards: reading.cards,
+      created_at: new Date().toISOString(),
+    };
+    
+    // Store in local storage for now
+    // In a real app, this would be stored in the database
+    const savedReadings = getReadings();
+    savedReadings.push(savedReading);
+    localStorage.setItem('tarotReadings', JSON.stringify(savedReadings));
+    
+    return savedReading;
+  } catch (error) {
+    console.error('Error saving reading:', error);
+    return null;
+  }
+};
+
 // Function to get all saved readings
-export const getSavedReadings = async (): Promise<any[]> => {
+export const getReadings = (): SavedReading[] => {
+  try {
+    const savedReadings = localStorage.getItem('tarotReadings');
+    return savedReadings ? JSON.parse(savedReadings) : [];
+  } catch (error) {
+    console.error('Error getting readings:', error);
+    return [];
+  }
+};
+
+// Function to get all saved readings from the database
+export const getSavedReadings = async (): Promise<SavedReading[]> => {
   try {
     const { data: { user } } = await supabase.auth.getUser();
     
@@ -119,7 +176,13 @@ export const getSavedReadings = async (): Promise<any[]> => {
       return [];
     }
 
-    return data || [];
+    return (data || []).map(item => ({
+      id: item.id,
+      readingType: item.reading_type,
+      cards: item.cards as DrawnCard[],
+      created_at: item.created_at,
+      notes: item.notes
+    }));
   } catch (error) {
     console.error('Error getting saved readings:', error);
     return [];

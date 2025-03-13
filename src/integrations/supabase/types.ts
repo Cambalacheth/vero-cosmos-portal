@@ -36,6 +36,33 @@ export type Database = {
         }
         Relationships: []
       }
+      tarot_readings: {
+        Row: {
+          cards: Json
+          created_at: string
+          id: string
+          notes: string | null
+          reading_type: string
+          user_id: string
+        }
+        Insert: {
+          cards: Json
+          created_at?: string
+          id?: string
+          notes?: string | null
+          reading_type: string
+          user_id: string
+        }
+        Update: {
+          cards?: Json
+          created_at?: string
+          id?: string
+          notes?: string | null
+          reading_type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

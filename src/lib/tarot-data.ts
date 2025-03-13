@@ -5,11 +5,12 @@ export interface TarotCard {
   name: string;
   arcana: 'major' | 'minor';
   suit?: 'wands' | 'cups' | 'swords' | 'pentacles';
+  element?: string;
   number?: number;
   meaningUpright: string[];
   meaningReversed: string[];
   description: string;
-  imageUrl: string;
+  imageUrl: string; // Using imageUrl consistently
 }
 
 // Sample tarot deck with placeholder images

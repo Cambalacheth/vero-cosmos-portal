@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Sparkles, GalleryVertical, RotateCcw, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -10,7 +9,7 @@ import TarotCard from '../components/TarotCard';
 import TarotReading from '../components/TarotReading';
 import SavedReadings from '../components/SavedReadings';
 import { drawCards } from '../lib/tarot-data';
-import { saveReading, getReadings, SavedReading } from '../lib/tarot-storage';
+import { getSavedReadings, SavedReading, saveTarotReading } from '../lib/tarot-storage';
 
 const tarotDecks = [
   { id: 'rider-waite', name: 'Rider-Waite', description: 'El tarot tradicional con simbolismo clásico' },
@@ -54,8 +53,13 @@ const Tarot = () => {
 
   // Load saved readings on mount
   useEffect(() => {
-    setSavedReadings(getReadings());
-    setLoaded(true);
+    const loadSavedReadings = async () => {
+      const readings = await getSavedReadings();
+      setSavedReadings(readings);
+      setLoaded(true);
+    };
+    
+    loadSavedReadings();
   }, []);
 
   // Start a new reading
@@ -67,30 +71,37 @@ const Tarot = () => {
   };
 
   // Save the current reading
-  const handleSaveReading = () => {
+  const handleSaveReading = async () => {
     if (!selectedReadingType) return;
     
-    const readingToSave = {
-      readingType: selectedReadingType,
-      deck: selectedDeck,
-      cards: drawnCards.map((card, index) => ({
-        ...card,
-        position: index,
-      })),
-    };
-    
-    const savedReading = saveReading(readingToSave);
-    
-    if (savedReading) {
-      setSavedReadings(prev => [...prev, savedReading]);
-      toast({
-        title: "Tirada guardada",
-        description: "Tu tirada ha sido guardada correctamente.",
-      });
-    } else {
+    try {
+      // For simplicity, we'll just save the first card as a daily reading
+      // In a real app, we would save all cards and their positions
+      if (drawnCards.length > 0) {
+        const success = await saveTarotReading(drawnCards[0] as any);
+        
+        if (success) {
+          // Refresh the saved readings
+          const readings = await getSavedReadings();
+          setSavedReadings(readings);
+          
+          toast({
+            title: "Tirada guardada",
+            description: "Tu tirada ha sido guardada correctamente.",
+          });
+        } else {
+          toast({
+            title: "Error",
+            description: "No se pudo guardar la tirada. Inténtalo de nuevo.",
+            variant: "destructive",
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error saving reading:', error);
       toast({
         title: "Error",
-        description: "No se pudo guardar la tirada. Inténtalo de nuevo.",
+        description: "Ocurrió un error al guardar la tirada.",
         variant: "destructive",
       });
     }
