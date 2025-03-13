@@ -16,6 +16,7 @@ import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
 import AuthVerify from "./pages/AuthVerify";
 import Onboarding from "./pages/Onboarding";
+import WealthMap from "./pages/WealthMap";
 
 const queryClient = new QueryClient();
 
@@ -38,6 +39,7 @@ const App = () => (
               <Route path="/aprender" element={<Home />} />
               <Route path="/perfil" element={<Profile />} />
               <Route path="/premium" element={<Premium />} />
+              <Route path="/riqueza" element={<WealthMap />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

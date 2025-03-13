@@ -1,61 +1,65 @@
 
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Home, CalendarDays, Sparkles, BookOpen, UserRound } from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { Sparkles, Calendar, User, Home, Compass, DollarSign } from 'lucide-react';
 
 const NavBar = () => {
+  const navigate = useNavigate();
   const location = useLocation();
   
-  const navItems = [
-    {
-      name: 'Home',
-      icon: Home,
-      path: '/home'
-    },
-    {
-      name: 'Calendario',
-      icon: CalendarDays,
-      path: '/calendario'
-    },
-    {
-      name: 'Tarot',
-      icon: Sparkles,
-      path: '/tarot'
-    },
-    {
-      name: 'Aprender',
-      icon: BookOpen,
-      path: '/aprender'
-    },
-    {
-      name: 'Perfil',
-      icon: UserRound,
-      path: '/perfil'
-    }
-  ];
+  const isActive = (path: string) => {
+    return location.pathname === path;
+  };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white bg-opacity-90 backdrop-blur-sm shadow-lg z-50">
+    <div className="fixed bottom-0 left-0 w-full py-2 backdrop-blur-md bg-white/30 border-t border-cosmos-pink/20 dark:bg-gray-900/60 z-50">
       <div className="container mx-auto">
-        <nav className="flex justify-around items-center h-16">
-          {navItems.map((item) => {
-            const isActive = location.pathname === item.path;
-            return (
-              <Link 
-                key={item.name} 
-                to={item.path} 
-                className={`flex flex-col items-center justify-center px-3 py-1 rounded-lg transition-colors
-                          ${isActive ? 'text-cosmos-darkGold' : 'text-gray-500'}`}
-              >
-                <item.icon size={20} className={isActive ? 'animate-pulse-soft' : ''} />
-                <span className="text-xs mt-1 font-medium">{item.name}</span>
-                {isActive && (
-                  <div className="h-1 w-8 bg-gradient-to-r from-cosmos-gold to-cosmos-darkGold rounded-full mt-1" />
-                )}
-              </Link>
-            );
-          })}
-        </nav>
+        <div className="flex justify-between items-center">
+          <button 
+            className={`flex flex-col items-center space-y-1 px-4 py-1 rounded-lg transition-all
+                      ${isActive('/home') ? 'text-cosmos-darkGold' : 'text-gray-500'}`}
+            onClick={() => navigate('/home')}
+          >
+            <Home className="w-6 h-6" />
+            <span className="text-xs">Inicio</span>
+          </button>
+          
+          <button 
+            className={`flex flex-col items-center space-y-1 px-4 py-1 rounded-lg transition-all
+                      ${isActive('/tarot') ? 'text-cosmos-darkGold' : 'text-gray-500'}`}
+            onClick={() => navigate('/tarot')}
+          >
+            <Sparkles className="w-6 h-6" />
+            <span className="text-xs">Tarot</span>
+          </button>
+          
+          <button 
+            className={`flex flex-col items-center space-y-1 px-4 py-1 rounded-lg transition-all
+                      ${isActive('/calendario') ? 'text-cosmos-darkGold' : 'text-gray-500'}`}
+            onClick={() => navigate('/calendario')}
+          >
+            <Calendar className="w-6 h-6" />
+            <span className="text-xs">Calendario</span>
+          </button>
+          
+          <button 
+            className={`flex flex-col items-center space-y-1 px-4 py-1 rounded-lg transition-all
+                      ${isActive('/riqueza') ? 'text-cosmos-darkGold' : 'text-gray-500'}`}
+            onClick={() => navigate('/riqueza')}
+          >
+            <DollarSign className="w-6 h-6" />
+            <span className="text-xs">Riqueza</span>
+          </button>
+          
+          <button 
+            className={`flex flex-col items-center space-y-1 px-4 py-1 rounded-lg transition-all
+                      ${isActive('/perfil') ? 'text-cosmos-darkGold' : 'text-gray-500'}`}
+            onClick={() => navigate('/perfil')}
+          >
+            <User className="w-6 h-6" />
+            <span className="text-xs">Perfil</span>
+          </button>
+        </div>
       </div>
     </div>
   );
