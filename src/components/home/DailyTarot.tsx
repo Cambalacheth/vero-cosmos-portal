@@ -30,7 +30,13 @@ const DailyTarot = () => {
         const todaysReading = await getTodaysTarotReading();
         
         if (todaysReading) {
-          setDrawnCard(todaysReading);
+          // Make sure we have a properly typed card before updating state
+          const typedCardReading = {
+            card: getTypedCard(todaysReading.card),
+            isReversed: todaysReading.isReversed
+          };
+          
+          setDrawnCard(typedCardReading);
           setIsCardDrawn(true);
           setIsCardRevealed(true);
         }
@@ -138,7 +144,7 @@ const DailyTarot = () => {
         <div className="flex flex-col items-center">
           <div className="w-40 mx-auto">
             <TarotCard 
-              card={isCardRevealed ? getTypedCard(drawnCard?.card) : undefined}
+              card={isCardRevealed ? drawnCard?.card : undefined}
               isRevealed={isCardRevealed} 
               isReversed={drawnCard?.isReversed || false}
             />
