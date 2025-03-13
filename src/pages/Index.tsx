@@ -17,7 +17,7 @@ const Index = () => {
     <div className="relative w-full overflow-hidden">
       <StarryBackground />
       <BackgroundImage 
-        backgroundImageUrl="https://images.unsplash.com/photo-1492321936769-b49830bc1d1e?auto=format&fit=crop&q=80"
+        backgroundImageUrl="https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1413&q=80"
         usePlainBackground={false}
       >
         <div className="min-h-screen flex flex-col items-center justify-center px-4 py-10 relative z-10">
@@ -58,7 +58,7 @@ const Index = () => {
             </div>
             
             <div className={`mb-6 transition-all duration-1000 delay-700 ${loaded ? 'opacity-100' : 'opacity-0'}`}>
-              <Link to="/home">
+              <Link to="/auth">
                 <button 
                   className="button-effect group relative px-8 py-3 glass-card border-cosmos-pink border overflow-hidden rounded-full"
                 >
@@ -68,10 +68,6 @@ const Index = () => {
                   <div className="absolute inset-0 bg-gradient-to-r from-cosmos-gold to-cosmos-darkGold opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-full"></div>
                 </button>
               </Link>
-            </div>
-            
-            <div className="users-counter text-sm text-cosmos-darkGold mb-4">
-              <span className="font-semibold">+5,000</span> personas ya descubrieron su camino
             </div>
             
             <div className={`transition-all duration-1000 delay-500 ${loaded ? 'opacity-100' : 'opacity-0'}`}>

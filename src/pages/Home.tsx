@@ -1,16 +1,15 @@
 
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import BackgroundImage from '../components/BackgroundImage';
 import NavBar from '../components/NavBar';
-import { ThemeSelector } from '@/components/ThemeSelector';
 import { 
   calculateNatalChart, 
   generatePersonalizedHoroscope, 
   NatalChartData, 
   NatalChartInput 
 } from '../lib/natal-chart';
-
-// Import the refactored components
+import { useAuth } from '@/contexts/AuthContext';
 import TabNavigation from '../components/home/TabNavigation';
 import NatalChartForm from '../components/home/NatalChartForm';
 import NatalChartDisplay from '../components/home/NatalChartDisplay';
@@ -18,11 +17,15 @@ import DailyTarot from '../components/home/DailyTarot';
 import DailyHoroscope from '../components/home/DailyHoroscope';
 import CelestialPositionsWidget from '../components/home/CelestialPositionsWidget';
 import ThemeToggleButton from '@/components/ThemeToggleButton';
+import { useTheme } from '@/contexts/ThemeContext';
 
 const Home = () => {
   const [loaded, setLoaded] = useState(false);
   const [selectedTab, setSelectedTab] = useState<'natal' | 'tarot' | 'horoscope'>('natal');
   const [hasNatalChart, setHasNatalChart] = useState(false);
+  const { session, loading } = useAuth();
+  const navigate = useNavigate();
+  const { theme } = useTheme();
   
   // State for calculated natal chart data
   const [natalChart, setNatalChart] = useState<NatalChartData | null>(null);
@@ -30,7 +33,12 @@ const Home = () => {
 
   useEffect(() => {
     setLoaded(true);
-  }, []);
+    
+    // Redirect to auth page if user is not logged in
+    if (!loading && !session) {
+      navigate('/auth');
+    }
+  }, [loading, session, navigate]);
 
   const handleCreateNatalChart = (input: NatalChartInput) => {
     const calculatedChart = calculateNatalChart(input);
@@ -50,6 +58,14 @@ const Home = () => {
     )
   );
 
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col min-h-screen">
       <BackgroundImage fullHeight={false} usePlainBackground={true}>
@@ -61,7 +77,11 @@ const Home = () => {
           >
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl text-center font-playfair font-semibold clip-text">Tu Portal Cósmico</h2>
-              <ThemeSelector />
+              {theme === 'light' && (
+                <div className="hidden">
+                  {/* ThemeSelector solo se mostrará en modo claro pero lo mantenemos oculto */}
+                </div>
+              )}
             </div>
             
             {/* Tab Navigation */}

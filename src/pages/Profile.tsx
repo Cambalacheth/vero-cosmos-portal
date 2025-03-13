@@ -1,16 +1,45 @@
 
 import React, { useState, useEffect } from 'react';
-import { UserRound } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { UserRound, LogOut } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 import BackgroundImage from '../components/BackgroundImage';
 import NavBar from '../components/NavBar';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/components/ui/use-toast';
 
 const Profile = () => {
   const [loaded, setLoaded] = useState(false);
+  const { user, session } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
   useEffect(() => {
     setLoaded(true);
-  }, []);
+    
+    // Redirect to auth page if user is not logged in
+    if (!session) {
+      navigate('/auth');
+    }
+  }, [session, navigate]);
+
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      toast({
+        title: "Sesión cerrada",
+        description: "Has cerrado sesión exitosamente",
+      });
+      navigate('/');
+    } catch (error) {
+      console.error('Error signing out:', error);
+      toast({
+        title: "Error",
+        description: "No se pudo cerrar la sesión",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -29,10 +58,19 @@ const Profile = () => {
                   <UserRound size={32} className="text-cosmos-darkGold" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-playfair text-cosmos-darkGold">Usuario</h3>
+                  <h3 className="text-xl font-playfair text-cosmos-darkGold">
+                    {user?.email || 'Usuario'}
+                  </h3>
                   <p className="text-sm">♈ Aries | ♋ Luna en Cáncer | ♊ Ascendente Géminis</p>
                 </div>
               </div>
+              <button 
+                className="w-full button-effect px-4 py-2 bg-cosmos-pink bg-opacity-20 rounded-lg text-cosmos-darkGold border border-cosmos-pink mt-2"
+                onClick={handleLogout}
+              >
+                <LogOut size={16} className="inline mr-2" />
+                Cerrar Sesión
+              </button>
               <button className="w-full button-effect px-4 py-2 bg-cosmos-pink bg-opacity-20 rounded-lg text-cosmos-darkGold border border-cosmos-pink mt-2">
                 Editar Datos de Nacimiento
               </button>
