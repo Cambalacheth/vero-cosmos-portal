@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -21,6 +20,7 @@ import Community from "./pages/Community";
 import Maps from "./pages/Maps";
 import CareerMap from "./pages/CareerMap";
 import LoveMap from "./pages/LoveMap";
+import MapComparisonPage from './pages/MapComparison';
 
 const queryClient = new QueryClient();
 
@@ -49,6 +49,7 @@ const App = () => (
                 <Route path="/carrera" element={<CareerMap />} />
                 <Route path="/amor" element={<LoveMap />} />
                 <Route path="/comunidad" element={<Community />} />
+                <Route path="/mapas/comparacion/:mapId" element={<MapComparisonPage />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>

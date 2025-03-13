@@ -2,7 +2,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { cosmicMaps, MapType } from '@/lib/map-types';
-import { Lock, Calendar, ArrowRight } from 'lucide-react';
+import { Lock, Calendar, ArrowRight, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 
@@ -17,6 +17,20 @@ const MapsGrid: React.FC = () => {
       toast({
         title: "Próximamente",
         description: `El ${map.title} estará disponible muy pronto. ¡Mantente atento!`,
+        variant: "default",
+      });
+    }
+  };
+
+  const handleCompareClick = (map: MapType, e: React.MouseEvent) => {
+    e.stopPropagation(); // Evitar que se active el click del mapa
+    
+    if (map.available) {
+      navigate(`/mapas/comparacion/${map.id}`);
+    } else {
+      toast({
+        title: "No disponible",
+        description: "No se puede comparar un mapa que aún no está disponible.",
         variant: "default",
       });
     }
@@ -45,7 +59,17 @@ const MapsGrid: React.FC = () => {
             </div>
           </div>
           
-          <div className="mt-4 flex justify-end">
+          <div className="mt-4 flex justify-between">
+            <Button
+              variant="outline"
+              size="sm"
+              className="px-2 py-1 text-xs"
+              onClick={(e) => handleCompareClick(map, e)}
+              disabled={!map.available}
+            >
+              <RefreshCw className="mr-1 h-3 w-3" /> Comparar
+            </Button>
+            
             <Button
               variant={map.available ? "default" : "outline"}
               className={`px-4 py-2 rounded-lg ${map.available ? 'bg-cosmos-pink bg-opacity-20 text-cosmos-darkGold border border-cosmos-pink' : 'text-gray-500'}`}
