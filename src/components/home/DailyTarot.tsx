@@ -1,139 +1,176 @@
 
 import React, { useState, useEffect } from 'react';
-import { Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Sparkles } from 'lucide-react';
+import { useToast } from '@/components/ui/use-toast';
 import TarotCard from '@/components/TarotCard';
 import { drawCards } from '@/lib/tarot-data';
-import { saveTarotReading, getTodaysTarotReading, DrawnCard } from '@/lib/tarot-storage';
-import { useToast } from '@/components/ui/use-toast';
+import { getTodaysTarotReading, saveTarotReading } from '@/lib/tarot-storage';
+import { supabase } from '@/integrations/supabase/client';
+import { TarotCard as TarotCardType } from '@/lib/tarot-data';
 
-const DailyTarot: React.FC = () => {
-  const { toast } = useToast();
+const DailyTarot = () => {
+  const [isCardDrawn, setIsCardDrawn] = useState(false);
   const [isCardRevealed, setIsCardRevealed] = useState(false);
-  const [dailyCard, setDailyCard] = useState<DrawnCard | null>(null);
-  const [hasDrawnToday, setHasDrawnToday] = useState(false);
+  const [drawnCard, setDrawnCard] = useState<{ card: TarotCardType, isReversed: boolean } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const { toast } = useToast();
 
+  // Check if user has already drawn a card today
   useEffect(() => {
-    // Check if user has already drawn a card today
     const checkTodaysReading = async () => {
-      setIsLoading(true);
       try {
-        const savedReading = await getTodaysTarotReading();
-        if (savedReading) {
-          setDailyCard(savedReading);
-          setHasDrawnToday(true);
-          setIsCardRevealed(true);
-        } else {
-          // No reading yet today, prepare a new card
-          setDailyCard(drawCards(1)[0] as unknown as DrawnCard);
-          setIsCardRevealed(false);
+        // Check if user is logged in
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          setIsLoading(false);
+          return;
         }
+        
+        const todaysReading = await getTodaysTarotReading();
+        
+        if (todaysReading) {
+          setDrawnCard(todaysReading);
+          setIsCardDrawn(true);
+          setIsCardRevealed(true);
+        }
+        
+        setIsLoading(false);
       } catch (error) {
         console.error('Error checking today\'s reading:', error);
-        // Fall back to a new card
-        setDailyCard(drawCards(1)[0] as unknown as DrawnCard);
-        setIsCardRevealed(false);
-      } finally {
         setIsLoading(false);
       }
     };
     
     checkTodaysReading();
   }, []);
-
+  
+  const handleDrawCard = () => {
+    // Draw a random card
+    const drawn = drawCards(1)[0];
+    setDrawnCard(drawn);
+    setIsCardDrawn(true);
+  };
+  
   const handleRevealCard = async () => {
-    if (!dailyCard) return;
+    if (!drawnCard) return;
     
     setIsCardRevealed(true);
     
-    // Save today's reading if not already saved
-    if (!hasDrawnToday) {
-      try {
-        const success = await saveTarotReading(dailyCard);
-        if (success) {
-          setHasDrawnToday(true);
-          toast({
-            title: "Carta guardada",
-            description: "Tu carta del día ha sido guardada.",
-            duration: 3000,
-          });
-        } else {
-          toast({
-            title: "Error",
-            description: "No se pudo guardar la carta. Inténtalo de nuevo más tarde.",
-            variant: "destructive",
-            duration: 5000,
-          });
-        }
-      } catch (error) {
-        console.error('Error saving card:', error);
-        toast({
-          title: "Error",
-          description: "Ocurrió un error al guardar tu carta.",
-          variant: "destructive",
-          duration: 5000,
-        });
+    try {
+      // Check if user is logged in
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (user) {
+        // Save the reading for today
+        await saveTarotReading(drawnCard);
       }
+      
+      toast({
+        title: "Carta revelada",
+        description: `Has obtenido la carta ${drawnCard.card.name}${drawnCard.isReversed ? ' invertida' : ''}.`,
+      });
+    } catch (error) {
+      console.error('Error saving tarot reading:', error);
     }
   };
 
+  // Ensure the card suit is properly typed
+  const getTypedCard = (card: any): TarotCardType => {
+    // Copy all properties
+    const typedCard: TarotCardType = {
+      id: card.id,
+      name: card.name,
+      arcana: card.arcana,
+      meaningUpright: card.meaningUpright,
+      meaningReversed: card.meaningReversed,
+      description: card.description,
+      imageUrl: card.imageUrl
+    };
+    
+    // Add optional properties if they exist
+    if (card.suit) {
+      // Ensure suit is one of the allowed values
+      if (['wands', 'cups', 'swords', 'pentacles'].includes(card.suit)) {
+        typedCard.suit = card.suit as "wands" | "cups" | "swords" | "pentacles";
+      }
+    }
+    
+    if (card.element) {
+      typedCard.element = card.element;
+    }
+    
+    if (card.number !== undefined) {
+      typedCard.number = card.number;
+    }
+    
+    return typedCard;
+  };
+  
   if (isLoading) {
     return (
-      <div className="glass-card p-4 rounded-xl">
-        <h3 className="text-xl font-playfair text-cosmos-darkGold mb-3">Tu Carta del Día</h3>
-        <div className="flex justify-center items-center h-48">
-          <p className="text-cosmos-darkGold">Cargando tu carta...</p>
-        </div>
+      <div className="glass-card p-4 rounded-xl min-h-[300px] flex flex-col items-center justify-center">
+        <div className="animate-pulse">Cargando...</div>
       </div>
     );
   }
-
-  if (!dailyCard) {
-    return (
-      <div className="glass-card p-4 rounded-xl">
-        <h3 className="text-xl font-playfair text-cosmos-darkGold mb-3">Tu Carta del Día</h3>
-        <div className="flex justify-center items-center h-48">
-          <p className="text-cosmos-darkGold">No se pudo cargar tu carta. Inténtalo más tarde.</p>
-        </div>
-      </div>
-    );
-  }
-
+  
   return (
     <div className="glass-card p-4 rounded-xl">
-      <h3 className="text-xl font-playfair text-cosmos-darkGold mb-3">Tu Carta del Día</h3>
-      <div className="flex justify-center mb-4">
-        <div className="w-48">
-          <TarotCard 
-            card={{
-              ...dailyCard.card,
-              imageUrl: dailyCard.card.imageUrl // Make sure imageUrl is used
-            }}
-            isReversed={dailyCard.isReversed} 
-            isRevealed={isCardRevealed}
-            onClick={handleRevealCard}
-          />
-        </div>
-      </div>
-      {isCardRevealed ? (
-        <div className="text-center">
-          <h4 className="font-medium text-cosmos-darkGold mb-2">{dailyCard.card.name} {dailyCard.isReversed ? '(Invertida)' : ''}</h4>
-          <p className="text-sm italic">
-            {dailyCard.isReversed ? 
-              dailyCard.card.meaningReversed[0] : 
-              dailyCard.card.meaningUpright[0]
-            }
+      <h3 className="text-lg font-playfair text-cosmos-darkGold mb-2">
+        Carta del Día
+      </h3>
+      
+      {!isCardDrawn ? (
+        <div className="flex flex-col items-center justify-center py-6">
+          <p className="text-sm text-center text-gray-600 mb-4">
+            Descubre qué energía te acompaña hoy con una tirada de tarot diaria
           </p>
+          <Button 
+            onClick={handleDrawCard}
+            className="button-effect glass-card bg-cosmos-gold/20 hover:bg-cosmos-gold/40 text-cosmos-darkGold border border-cosmos-gold/30"
+          >
+            <Sparkles className="mr-2 h-4 w-4" />
+            Tirar Carta
+          </Button>
         </div>
       ) : (
-        <Button 
-          className="w-full button-effect px-4 py-2 bg-cosmos-pink bg-opacity-20 rounded-lg text-cosmos-darkGold border border-cosmos-pink"
-          onClick={handleRevealCard}
-          disabled={hasDrawnToday && !isCardRevealed}
-        >
-          {hasDrawnToday && !isCardRevealed ? "Ya has tirado el tarot hoy" : "Revelar Mi Carta"}
-        </Button>
+        <div className="flex flex-col items-center">
+          <div className="w-40 mx-auto">
+            <TarotCard 
+              card={isCardRevealed ? getTypedCard(drawnCard?.card) : undefined}
+              isRevealed={isCardRevealed} 
+              isReversed={drawnCard?.isReversed || false}
+            />
+          </div>
+          
+          {!isCardRevealed && (
+            <>
+              <p className="text-sm text-center my-4 text-gray-600">
+                ¿Lista para descubrir tu carta de hoy?
+              </p>
+              <Button 
+                onClick={handleRevealCard}
+                className="button-effect glass-card bg-cosmos-gold/20 hover:bg-cosmos-gold/40 text-cosmos-darkGold border border-cosmos-gold/30"
+              >
+                Revelar Carta
+              </Button>
+            </>
+          )}
+          
+          {isCardRevealed && drawnCard && (
+            <div className="mt-4 text-center">
+              <h4 className="font-playfair text-cosmos-darkGold">
+                {drawnCard.card.name} {drawnCard.isReversed ? '(Invertida)' : ''}
+              </h4>
+              <p className="text-sm my-2 text-gray-600">
+                {drawnCard.isReversed 
+                  ? drawnCard.card.meaningReversed[0]
+                  : drawnCard.card.meaningUpright[0]}
+              </p>
+            </div>
+          )}
+        </div>
       )}
     </div>
   );

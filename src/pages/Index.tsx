@@ -15,15 +15,15 @@ const Index = () => {
           <ThemeToggleButton />
         </div>
         
-        <div className="glass-card p-8 sm:p-12 rounded-xl max-w-lg mx-auto">
+        <div className="glass-card p-8 sm:p-12 rounded-xl max-w-lg mx-auto bg-black/40 backdrop-blur-lg">
           <div className="mb-6">
-            <h1 className="text-4xl sm:text-5xl font-playfair font-bold mb-2">
-              <span className="clip-text">Cosmos</span>
+            <h1 className="text-4xl sm:text-5xl font-playfair font-bold mb-2 text-white">
+              <span className="clip-text bg-gradient-to-r from-cosmos-gold to-cosmos-darkGold text-transparent bg-clip-text">Cosmos</span>
             </h1>
-            <p className="text-lg sm:text-xl font-medium text-cosmos-darkGold">Tu guía astrológica personal</p>
+            <p className="text-lg sm:text-xl font-medium text-cosmos-gold">Tu guía astrológica personal</p>
           </div>
           
-          <p className="mb-8 text-cosmos-contrast">
+          <p className="mb-8 text-white text-base sm:text-lg">
             Descubre los secretos de los astros, conecta con tu energía interior 
             y encuentra tu camino a través de las estrellas.
           </p>
@@ -31,14 +31,14 @@ const Index = () => {
           <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 justify-center">
             <Button 
               onClick={() => navigate('/auth')}
-              className="bg-gradient-to-r from-cosmos-gold to-cosmos-darkGold text-white px-6 py-2"
+              className="bg-gradient-to-r from-cosmos-gold to-cosmos-darkGold text-white px-6 py-2 hover:opacity-90"
             >
               Comenzar
             </Button>
             <Button 
               variant="outline"
               onClick={() => navigate('/auth')}
-              className="border-cosmos-pink text-cosmos-darkGold px-6 py-2"
+              className="border-cosmos-pink text-cosmos-gold px-6 py-2 hover:bg-cosmos-pink/10"
             >
               Iniciar Sesión
             </Button>
