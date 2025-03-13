@@ -1,5 +1,5 @@
-
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Bell, BellOff, Calendar, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -37,8 +37,8 @@ const CosmicEventNotification: React.FC = () => {
   });
   const [unreadCount, setUnreadCount] = useState(0);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
-  // Simular carga de notificaciones (en producción, esto vendría de una base de datos)
   useEffect(() => {
     const mockNotifications: Notification[] = [
       {
@@ -70,12 +70,10 @@ const CosmicEventNotification: React.FC = () => {
     setNotifications(mockNotifications);
     updateUnreadCount(mockNotifications);
     
-    // Configurar notificaciones del navegador si están disponibles
     if ('Notification' in window) {
       Notification.requestPermission();
     }
     
-    // Simular una nueva notificación llegando después de 10 segundos
     const timer = setTimeout(() => {
       const newNotification: Notification = {
         id: '4',
@@ -90,13 +88,11 @@ const CosmicEventNotification: React.FC = () => {
       setNotifications(updatedNotifications);
       updateUnreadCount(updatedNotifications);
       
-      // Mostrar toast de notificación
       toast({
         title: "Nuevo evento cósmico",
         description: newNotification.title,
       });
       
-      // Mostrar notificación del navegador si está habilitado
       if ('Notification' in window && Notification.permission === 'granted') {
         new Notification('Vero Cosmos: Nuevo evento cósmico', {
           body: newNotification.title,
