@@ -17,7 +17,7 @@ const Index = () => {
     <div className="relative w-full overflow-hidden">
       <StarryBackground />
       <BackgroundImage 
-        backgroundImageUrl="https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1413&q=80"
+        backgroundImageUrl="https://images.unsplash.com/photo-1532274402911-5a369e4c4bb5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
         usePlainBackground={false}
       >
         <div className="min-h-screen flex flex-col items-center justify-center px-4 py-10 relative z-10">
