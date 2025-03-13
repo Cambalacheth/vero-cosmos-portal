@@ -3,7 +3,7 @@ import React from 'react';
 import { NatalChartData } from '@/lib/natal-chart';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Lock } from 'lucide-react';
+import { Lock, MessageSquare, Calendar, CheckSquare } from 'lucide-react';
 import { getWealthMapBasicAnalysis } from '@/lib/wealth-map-service';
 
 interface WealthMapPreviewProps {
@@ -45,11 +45,37 @@ const WealthMapPreview: React.FC<WealthMapPreviewProps> = ({ natalChart, onUpgra
             </div>
           </div>
           
-          <div className="glass-card p-3 rounded-lg flex items-center space-x-2">
+          <div className="mb-4 glass-card p-3 rounded-lg flex items-center space-x-2">
             <Lock className="w-4 h-4 text-cosmos-darkGold" />
             <div>
               <h4 className="font-medium text-sm text-cosmos-darkGold">Casas 8 y 11</h4>
               <p className="text-xs text-gray-500">Contenido premium</p>
+            </div>
+          </div>
+          
+          <div className="space-y-3 mb-4">
+            <div className="flex items-center space-x-2 text-xs text-gray-500">
+              <Lock className="w-3 h-3 text-cosmos-darkGold" />
+              <div className="flex items-center">
+                <MessageSquare className="w-3 h-3 mr-1 text-cosmos-darkGold" />
+                <span>Consulta IA Astrológica Personalizada</span>
+              </div>
+            </div>
+            
+            <div className="flex items-center space-x-2 text-xs text-gray-500">
+              <Lock className="w-3 h-3 text-cosmos-darkGold" />
+              <div className="flex items-center">
+                <Calendar className="w-3 h-3 mr-1 text-cosmos-darkGold" />
+                <span>Calendario Financiero Personalizado</span>
+              </div>
+            </div>
+            
+            <div className="flex items-center space-x-2 text-xs text-gray-500">
+              <Lock className="w-3 h-3 text-cosmos-darkGold" />
+              <div className="flex items-center">
+                <CheckSquare className="w-3 h-3 mr-1 text-cosmos-darkGold" />
+                <span>Plan de Acción Personalizado</span>
+              </div>
             </div>
           </div>
         </CardContent>

@@ -1,638 +1,735 @@
 
-import { NatalChartData } from '@/lib/natal-chart';
+import { NatalChartData } from "./natal-chart";
+import { format, addDays } from "date-fns";
+import { es } from "date-fns/locale";
 
 // Basic analysis for free users
 export const getWealthMapBasicAnalysis = (natalChart: NatalChartData) => {
-  const house2SignName = getHouseSign(natalChart, 2);
-  const house10SignName = getHouseSign(natalChart, 10);
+  // Extract sun sign and house 2 sign for basic analysis
+  const sunSign = natalChart.sun.sign;
+  const house2Sign = findHouseSign(natalChart, 2);
+
+  // Basic analysis based on House 2 sign
+  let house2Analysis = getHouse2Analysis(house2Sign);
+  
+  // Basic monthly tip based on sun sign
+  let monthlyTip = getMonthlyTipBySunSign(sunSign);
   
   return {
-    summary: generateFinancialSummary(natalChart),
-    house2Analysis: generateHouse2Analysis(natalChart, house2SignName),
-    house10Analysis: generateHouse10Analysis(natalChart, house10SignName),
-    monthlyTip: generateMonthlyTip(natalChart)
+    house2Analysis,
+    monthlyTip
   };
 };
 
 // Full analysis for premium users
 export const getWealthMapFullAnalysis = (natalChart: NatalChartData) => {
-  const house2SignName = getHouseSign(natalChart, 2);
-  const house8SignName = getHouseSign(natalChart, 8);
-  const house10SignName = getHouseSign(natalChart, 10);
-  const house11SignName = getHouseSign(natalChart, 11);
-  
-  const basicAnalysis = getWealthMapBasicAnalysis(natalChart);
-  
-  return {
-    ...basicAnalysis,
-    jupiterSaturnAnalysis: generateJupiterSaturnAnalysis(natalChart),
-    houses8And11Analysis: generateHouses8And11Analysis(natalChart, house8SignName, house11SignName),
-    incomeStrategies: generateIncomeStrategies(natalChart, house2SignName),
-    careerRecommendations: generateCareerRecommendations(natalChart, house10SignName),
-    opportunityAttractionTips: generateOpportunityAttractionTips(natalChart),
-    financialCalendar: generateFinancialCalendar(),
-    sampleQuestions: [
-      "¿Cómo puedo aprovechar mejor la posición de Júpiter en mi carta para atraer abundancia?",
-      "¿Cuál es el mejor momento para iniciar un emprendimiento según mi carta natal?",
-      "¿Qué bloqueos financieros tengo según mi carta y cómo superarlos?",
-      "¿Qué tipo de inversiones son más favorables para mí según mi astrología?",
-      "¿Cómo puedo mejorar mi relación con el dinero según mi Casa 2?"
-    ]
-  };
-};
-
-// Helper functions to generate the analysis
-
-const getHouseSign = (natalChart: NatalChartData, houseNumber: number): string => {
-  const house = natalChart.houses.find(h => h.house === houseNumber);
-  return house?.sign || "Desconocido";
-};
-
-const getPlanetsInHouse = (natalChart: NatalChartData, houseNumber: number) => {
-  const planets = [];
-  
-  // Check each planet to see if it's in the specified house
-  if (natalChart.sun.house === houseNumber) planets.push({name: "Sol", data: natalChart.sun});
-  if (natalChart.moon.house === houseNumber) planets.push({name: "Luna", data: natalChart.moon});
-  if (natalChart.mercury.house === houseNumber) planets.push({name: "Mercurio", data: natalChart.mercury});
-  if (natalChart.venus.house === houseNumber) planets.push({name: "Venus", data: natalChart.venus});
-  if (natalChart.mars.house === houseNumber) planets.push({name: "Marte", data: natalChart.mars});
-  if (natalChart.jupiter.house === houseNumber) planets.push({name: "Júpiter", data: natalChart.jupiter});
-  if (natalChart.saturn.house === houseNumber) planets.push({name: "Saturno", data: natalChart.saturn});
-  if (natalChart.uranus.house === houseNumber) planets.push({name: "Urano", data: natalChart.uranus});
-  if (natalChart.neptune.house === houseNumber) planets.push({name: "Neptuno", data: natalChart.neptune});
-  if (natalChart.pluto.house === houseNumber) planets.push({name: "Plutón", data: natalChart.pluto});
-  
-  return planets;
-};
-
-const generateFinancialSummary = (natalChart: NatalChartData): string => {
-  const house2Sign = getHouseSign(natalChart, 2);
-  const house10Sign = getHouseSign(natalChart, 10);
-  const jupiterSign = natalChart.jupiter.sign;
-  
-  return `Con ${house2Sign} en tu Casa 2, tu relación con el dinero tiende a ser ${getSignMoneyAttribute(house2Sign)}. 
-  Tu carrera ideal, indicada por ${house10Sign} en la Casa 10, sugiere que debes buscar profesiones que te permitan 
-  ${getCareerAttributeBySign(house10Sign)}. La posición de Júpiter en ${jupiterSign} indica que 
-  tu mayor expansión financiera vendrá cuando ${getJupiterExpansionBySign(jupiterSign)}.`;
-};
-
-const generateHouse2Analysis = (natalChart: NatalChartData, house2Sign: string): string => {
-  const planetsInHouse2 = getPlanetsInHouse(natalChart, 2);
-  const planetaryInfluence = planetsInHouse2.length > 0 
-    ? `Además, tienes ${planetsInHouse2.map(p => p.name).join(', ')} en esta casa, lo que ${getPlanetaryInfluenceOnMoney(planetsInHouse2)}.` 
-    : '';
-  
-  return `Tu Casa 2 en ${house2Sign} revela que tu forma natural de generar ingresos está relacionada con 
-  ${getHouse2IncomeSourceBySign(house2Sign)}. ${planetaryInfluence} Esto significa que tu mayor potencial 
-  para generar dinero está en actividades donde puedas utilizar estas cualidades.`;
-};
-
-const generateHouse10Analysis = (natalChart: NatalChartData, house10Sign: string): string => {
-  const planetsInHouse10 = getPlanetsInHouse(natalChart, 10);
-  const planetaryInfluence = planetsInHouse10.length > 0 
-    ? `La presencia de ${planetsInHouse10.map(p => p.name).join(', ')} en esta casa indica que ${getPlanetaryInfluenceOnCareer(planetsInHouse10)}.` 
-    : '';
-  
-  return `Con ${house10Sign} en tu Casa 10, tu camino profesional más favorable se orienta hacia 
-  ${getHouse10CareerPathBySign(house10Sign)}. ${planetaryInfluence} Para maximizar tu éxito profesional, 
-  busca roles que te permitan expresar estas cualidades.`;
-};
-
-const generateJupiterSaturnAnalysis = (natalChart: NatalChartData): string => {
+  // Extract required data from natal chart
+  const sunSign = natalChart.sun.sign;
+  const moonSign = natalChart.moon.sign;
+  const ascSign = natalChart.ascendant.sign;
+  const house2Sign = findHouseSign(natalChart, 2);
+  const house8Sign = findHouseSign(natalChart, 8);
+  const house10Sign = findHouseSign(natalChart, 10);
+  const house11Sign = findHouseSign(natalChart, 11);
   const jupiterSign = natalChart.jupiter.sign;
   const jupiterHouse = natalChart.jupiter.house;
   const saturnSign = natalChart.saturn.sign;
   const saturnHouse = natalChart.saturn.house;
   
-  return `Júpiter, el planeta de la expansión y abundancia, se encuentra en ${jupiterSign} en tu Casa ${jupiterHouse}, 
-  lo que significa que tu mayor crecimiento financiero vendrá a través de ${getJupiterFinancialGrowthBySign(jupiterSign)}. 
-  Por otro lado, Saturno en ${saturnSign} en tu Casa ${saturnHouse} indica que debes ser disciplinado con 
-  ${getSaturnFinancialDisciplineBySign(saturnSign)} para evitar limitaciones económicas.`;
-};
-
-const generateHouses8And11Analysis = (natalChart: NatalChartData, house8Sign: string, house11Sign: string): string => {
-  return `Tu Casa 8 en ${house8Sign} sugiere que puedes beneficiarte financieramente a través de 
-  ${getHouse8WealthSourceBySign(house8Sign)}. Mientras tanto, tu Casa 11 en ${house11Sign} indica que 
-  tus redes sociales y contactos pueden favorecer tu economía cuando te enfocas en 
-  ${getHouse11NetworkBySign(house11Sign)}.`;
-};
-
-const generateIncomeStrategies = (natalChart: NatalChartData, house2Sign: string): string[] => {
-  const signSpecificStrategies = getIncomeStrategiesBySign(house2Sign);
-  const jupiterStrategies = getJupiterIncomeStrategies(natalChart.jupiter.sign);
+  // Generate full analyses
+  const house2Analysis = getHouse2Analysis(house2Sign);
+  const house10Analysis = getHouse10Analysis(house10Sign, sunSign);
+  const jupiterSaturnAnalysis = getJupiterSaturnAnalysis(jupiterSign, jupiterHouse, saturnSign, saturnHouse);
+  const houses8And11Analysis = getHouses8And11Analysis(house8Sign, house11Sign);
   
-  return [
-    ...signSpecificStrategies,
-    ...jupiterStrategies
-  ];
-};
-
-const generateCareerRecommendations = (natalChart: NatalChartData, house10Sign: string): string[] => {
-  return getCareerRecommendationsBySign(house10Sign);
-};
-
-const generateOpportunityAttractionTips = (natalChart: NatalChartData): string[] => {
-  const venusSign = natalChart.venus.sign;
-  const jupiterSign = natalChart.jupiter.sign;
+  // Generate summary
+  const summary = `Con tu Sol en ${sunSign}, Ascendente en ${ascSign} y Luna en ${moonSign}, 
+    tus fortalezas financieras incluyen ${getFinancialStrengthsBySunSign(sunSign)}. 
+    Tu Casa 2 en ${house2Sign} indica tu relación con el dinero, 
+    mientras que Jupiter en ${jupiterSign} revela tus oportunidades de expansión financiera.`;
   
-  return [
-    `Utiliza los colores asociados a ${venusSign} en tu espacio de trabajo para atraer abundancia.`,
-    `Realiza afirmaciones de prosperidad durante las fases de luna creciente para potenciar tus intenciones.`,
-    `Conecta con personas del signo ${jupiterSign} que pueden traer oportunidades a tu vida.`,
-    `Realiza rituales de gratitud cada vez que recibas dinero para abrir el canal de abundancia.`,
-    `Visualiza tus metas financieras especialmente durante tránsitos favorables de Júpiter.`
-  ];
-};
-
-const generateMonthlyTip = (natalChart: NatalChartData): string => {
-  const tips = [
-    "Este mes, presta especial atención a las oportunidades que surjan a través de colaboraciones con personas que comparten tus valores.",
-    "El momento es favorable para revisar tu presupuesto y establecer nuevas metas financieras que resuenen con tus pasiones.",
-    "Es un buen periodo para aprender nuevas habilidades que puedan diversificar tus fuentes de ingresos.",
-    "Las inversiones relacionadas con tecnología o innovación podrían ser particularmente favorables este mes.",
-    "Considera establecer una práctica diaria de visualización de abundancia para alinear tu energía con tus metas financieras."
+  // Generate income strategies
+  const incomeStrategies = generateIncomeStrategies(natalChart);
+  
+  // Generate career recommendations
+  const careerRecommendations = generateCareerRecommendations(natalChart);
+  
+  // Generate tips for attracting opportunities
+  const opportunityAttractionTips = generateOpportunityAttractionTips(natalChart);
+  
+  // Generate financial calendar for next 3 months
+  const financialCalendar = generateFinancialCalendar(natalChart);
+  
+  // Generate personalized action plan
+  const actionPlan = generateActionPlan(natalChart);
+  
+  // Sample questions for the AI chat
+  const sampleQuestions = [
+    "¿Cómo puedo aprovechar mejor la energía de mi Casa 2?",
+    "¿Qué profesiones son compatibles con mi carta natal?",
+    "¿Cuándo es el mejor momento para iniciar un nuevo proyecto financiero?",
+    "¿Cómo puedo mejorar mi disciplina financiera con Saturno en mi carta?",
+    "¿Qué inversiones serían más compatibles con mi carta natal?"
   ];
   
-  // Select a random tip for now - in a real app this would be based on current transits
-  const randomIndex = Math.floor(Math.random() * tips.length);
-  return tips[randomIndex];
+  // Collect everything into full analysis
+  return {
+    summary,
+    house2Analysis,
+    house10Analysis,
+    jupiterSaturnAnalysis,
+    houses8And11Analysis,
+    incomeStrategies,
+    careerRecommendations,
+    opportunityAttractionTips,
+    financialCalendar,
+    actionPlan,
+    sampleQuestions,
+    monthlyTip: getMonthlyTipBySunSign(sunSign)
+  };
 };
 
-const generateFinancialCalendar = () => {
-  // In a real app, this would calculate actual astrological transits
-  // For demo purposes, we'll return sample dates
+// Helper function to find which sign is in a specific house
+const findHouseSign = (natalChart: NatalChartData, houseNumber: number): string => {
+  const house = natalChart.houses.find(h => h.house === houseNumber);
+  return house ? house.sign : "Aries"; // Default to Aries if not found
+};
+
+// Analysis generators for different chart aspects
+const getHouse2Analysis = (house2Sign: string): string => {
+  const analyses: { [key: string]: string } = {
+    "Aries": "Tienes una actitud emprendedora hacia el dinero. Prefieres tomar la iniciativa en tus finanzas y puedes ser impulsivo con tus gastos. Tu fortaleza está en tu capacidad para generar ingresos de forma independiente y comenzar nuevos proyectos financieros.",
+    "Tauro": "Tienes una relación estable y segura con el dinero. Valoras la seguridad financiera y tiendes a acumular recursos. Eres hábil para identificar inversiones de valor a largo plazo y disfrutas los placeres materiales que el dinero puede proporcionar.",
+    "Géminis": "Tienes una relación versátil con el dinero. Puedes tener múltiples fuentes de ingresos simultáneamente y te adaptas rápidamente a nuevas oportunidades financieras. Tu mente curiosa te ayuda a aprender constantemente sobre finanzas y mercados.",
+    "Cáncer": "Tu relación con el dinero está vinculada a tu seguridad emocional. Tiendes a ahorrar para protegerte y a tu familia. Tienes un instinto natural para los negocios relacionados con el hogar, la nutrición o el cuidado de otros.",
+    "Leo": "Tienes una relación generosa con el dinero. Disfrutas ganándolo tanto como gastándolo en lujos y experiencias que reflejen tu estatus. Tu creatividad y carisma pueden abrirte puertas a oportunidades financieras únicas.",
+    "Virgo": "Tu aproximación al dinero es metódica y analítica. Eres excelente administrando recursos, creando presupuestos y encontrando formas de optimizar tus finanzas. Tu atención al detalle te hace valioso en roles financieros y administrativos.",
+    "Libra": "Buscas equilibrio en tus finanzas. Tienes talento para las negociaciones y asociaciones comerciales. Te atraen los entornos estéticamente agradables y puedes tener éxito en campos artísticos o relacionados con la belleza y el diseño.",
+    "Escorpio": "Tienes una intensa relación con el dinero y los recursos compartidos. Puedes tener talento para las inversiones, seguros o gestión de recursos ajenos. Tu intuición financiera es profunda y puedes transformar situaciones financieras difíciles.",
+    "Sagitario": "Tu visión expansiva te ayuda a encontrar oportunidades financieras en lugares inesperados. Te beneficias de conexiones internacionales y educación continua. Tu optimismo atrae abundancia, aunque debes cuidar la tendencia al gasto excesivo.",
+    "Capricornio": "Tienes una relación disciplinada y responsable con el dinero. Valoras la seguridad a largo plazo y trabajas metódicamente hacia tus metas financieras. Tu paciencia y determinación te permiten construir riqueza sólida con el tiempo.",
+    "Acuario": "Tu aproximación al dinero es innovadora y poco convencional. Puedes beneficiarte de tecnologías emergentes, causas humanitarias o conceptos avant-garde. Tu visión progresista te permite ver oportunidades que otros pasan por alto.",
+    "Piscis": "Tu relación con el dinero fluye como las mareas – a veces abundante, a veces escasa. Tienes intuición para las inversiones y puedes beneficiarte de campos creativos, espirituales o de ayuda a otros. Debes establecer límites claros en tus finanzas."
+  };
+  
+  return analyses[house2Sign] || "Tu relación con el dinero es única y está influenciada por múltiples factores en tu carta natal.";
+};
+
+const getHouse10Analysis = (house10Sign: string, sunSign: string): string => {
+  const analyses: { [key: string]: string } = {
+    "Aries": "Tu carrera ideal requiere liderazgo, iniciativa y la capacidad de abrir nuevos caminos. Profesiones que involucren emprendimiento, deportes, ventas competitivas o roles pioneros se alinean con tu energía.",
+    "Tauro": "Tu camino profesional se beneficia de la constancia y el enfoque práctico. Destacas en finanzas, banca, agricultura, arte, diseño, o cualquier campo que construya valor tangible con el tiempo.",
+    "Géminis": "Tu carrera ideal involucra comunicación, versatilidad y aprendizaje continuo. Periodismo, enseñanza, comercio, tecnología o cualquier rol que requiera adaptabilidad mental se alinea con tus talentos.",
+    "Cáncer": "Tu éxito profesional está vinculado a nutrición, cuidado y protección. Hostelería, bienes raíces, terapia, educación infantil o negocios familiares son áreas donde puedes prosperar.",
+    "Leo": "Tu carrera ideal te coloca en el centro de atención. Artes escénicas, entretenimiento, liderazgo, educación o cualquier campo donde puedas brillar con tu creatividad y carisma son ideales para ti.",
+    "Virgo": "Tu camino profesional se beneficia de tu precisión y capacidad analítica. Salud, análisis de datos, edición, contabilidad o campos que requieran meticulosidad y mejora continua se alinean con tus habilidades.",
+    "Libra": "Tu carrera ideal involucra diplomacia, estética y colaboración. Derecho, mediación, diseño, relaciones públicas o cualquier rol que requiera crear armonía y belleza se alinea con tus talentos.",
+    "Escorpio": "Tu éxito profesional viene de tu intensidad y capacidad transformadora. Investigación, psicología, finanzas, cirugía o campos que trabajen con recursos compartidos son áreas donde puedes destacar.",
+    "Sagitario": "Tu carrera ideal expande horizontes y transmite conocimiento. Educación superior, viajes, publicaciones, derecho internacional o roles que promuevan crecimiento y exploración se alinean con tu espíritu.",
+    "Capricornio": "Tu camino profesional se beneficia de tu ambición y disciplina. Administración, política, arquitectura, ingeniería o campos donde puedas construir estructuras duraderas son ideales para ti.",
+    "Acuario": "Tu éxito profesional viene de tu visión innovadora y enfoque humanitario. Tecnología, ciencias, causas sociales, redes o campos que creen cambios progresistas se alinean con tus ideales.",
+    "Piscis": "Tu carrera ideal conecta con la compasión y la imaginación. Artes, música, cine, psicología, espiritualidad o roles que ayuden a otros a sanar y soñar son áreas donde puedes encontrar propósito."
+  };
+  
+  // Combine with sun sign influence
+  return analyses[house10Sign] || `Tu Casa 10 indica tu potencial de éxito profesional y reputación pública.` + 
+    ` Con tu Sol en ${sunSign}, brillas especialmente cuando puedes expresar tus cualidades solares en tu carrera.`;
+};
+
+const getJupiterSaturnAnalysis = (jupiterSign: string, jupiterHouse: number, saturnSign: string, saturnHouse: number): string => {
+  // Jupiter analysis
+  let jupiterAnalysis = `Júpiter en ${jupiterSign} en tu Casa ${jupiterHouse} representa tu zona de expansión financiera y abundancia. ` +
+    `Esta posición favorece el crecimiento a través de ${getJupiterAreaBySign(jupiterSign)} y actividades relacionadas con tu Casa ${jupiterHouse}.`;
+  
+  // Saturn analysis
+  let saturnAnalysis = ` Saturno en ${saturnSign} en tu Casa ${saturnHouse} indica dónde necesitas estructura y disciplina financiera. ` +
+    `Esta posición requiere madurez en asuntos de ${getSaturnAreaBySign(saturnSign)} y responsabilidad en los temas de tu Casa ${saturnHouse}.`;
+  
+  return jupiterAnalysis + saturnAnalysis;
+};
+
+const getHouses8And11Analysis = (house8Sign: string, house11Sign: string): string => {
+  // House 8 analysis (shared resources, investments)
+  let house8Analysis = `Tu Casa 8 en ${house8Sign} revela tu relación con los recursos compartidos, inversiones y finanzas transformadoras. ` +
+    `Esta posición sugiere que ${getHouse8BySign(house8Sign)}.`;
+  
+  // House 11 analysis (networks, group resources)
+  let house11Analysis = ` Tu Casa 11 en ${house11Sign} indica cómo tus redes y conexiones influyen en tu prosperidad. ` +
+    `Esta posición sugiere que ${getHouse11BySign(house11Sign)}.`;
+  
+  return house8Analysis + house11Analysis;
+};
+
+// Helper functions for Jupiter and Saturn areas by sign
+const getJupiterAreaBySign = (sign: string): string => {
+  const areas: { [key: string]: string } = {
+    "Aries": "la iniciativa y nuevos comienzos",
+    "Tauro": "inversiones seguras y activos tangibles",
+    "Géminis": "comunicación y diversificación",
+    "Cáncer": "bienes raíces y negocios familiares",
+    "Leo": "inversiones creativas y especulativas",
+    "Virgo": "mejoras en eficiencia y servicios",
+    "Libra": "asociaciones y colaboraciones",
+    "Escorpio": "transformación y recursos compartidos",
+    "Sagitario": "educación, viajes e inversiones internacionales",
+    "Capricornio": "negocios establecidos y planificación a largo plazo",
+    "Acuario": "tecnología e innovación",
+    "Piscis": "creatividad e iniciativas compasivas"
+  };
+  return areas[sign] || "áreas que resuenan con tu intuición";
+};
+
+const getSaturnAreaBySign = (sign: string): string => {
+  const areas: { [key: string]: string } = {
+    "Aries": "moderación de impulsos financieros",
+    "Tauro": "evitar la rigidez en hábitos financieros",
+    "Géminis": "estructurar la comunicación financiera",
+    "Cáncer": "establecer límites emocionales en finanzas",
+    "Leo": "controlar gastos ostentosos",
+    "Virgo": "evitar la excesiva crítica financiera",
+    "Libra": "tomar decisiones financieras independientes",
+    "Escorpio": "gestionar sabiamente recursos compartidos",
+    "Sagitario": "limitar riesgos financieros excesivos",
+    "Capricornio": "balancear trabajo y recompensa",
+    "Acuario": "dar estructura a ideas financieras innovadoras",
+    "Piscis": "establecer límites claros en finanzas"
+  };
+  return areas[sign] || "áreas que requieren estructura y disciplina";
+};
+
+// Helper functions for Houses 8 and 11 by sign
+const getHouse8BySign = (sign: string): string => {
+  const descriptions: { [key: string]: string } = {
+    "Aries": "puedes beneficiarte de inversiones pioneras y capital de riesgo",
+    "Tauro": "las inversiones estables y a largo plazo favorecen tu crecimiento patrimonial",
+    "Géminis": "diversificar tus inversiones y aprender constantemente sobre finanzas es clave",
+    "Cáncer": "los negocios familiares y bienes raíces son fuentes favorables de inversión",
+    "Leo": "las inversiones creativas y especulativas pueden traerte ganancias significativas",
+    "Virgo": "el análisis detallado y la gestión meticulosa de inversiones te beneficia",
+    "Libra": "las asociaciones financieras y decisiones equilibradas favorecen tus inversiones",
+    "Escorpio": "tienes intuición natural para inversiones transformadoras y regenerativas",
+    "Sagitario": "las inversiones internacionales y educativas expanden tu riqueza",
+    "Capricornio": "la planificación estructurada y conservadora beneficia tus inversiones",
+    "Acuario": "las inversiones en tecnología e innovación pueden ser particularmente rentables",
+    "Piscis": "tu intuición te guía hacia inversiones creativas y compasivas"
+  };
+  return descriptions[sign] || "tus inversiones se benefician de un enfoque intuitivo y estratégico";
+};
+
+const getHouse11BySign = (sign: string): string => {
+  const descriptions: { [key: string]: string } = {
+    "Aries": "tus conexiones con líderes y pioneros impulsan tu prosperidad",
+    "Tauro": "redes estables y confiables te proporcionan recursos valiosos",
+    "Géminis": "tu red diversa de contactos te abre múltiples oportunidades",
+    "Cáncer": "grupos con valores familiares compartidos apoyan tu crecimiento",
+    "Leo": "comunidades creativas y organizaciones prominentes favorecen tu éxito",
+    "Virgo": "asociaciones profesionales y grupos de servicio amplían tus recursos",
+    "Libra": "las colaboraciones artísticas y diplomáticas enriquecen tu red",
+    "Escorpio": "conexiones profundas y transformadoras potencian tu abundancia",
+    "Sagitario": "redes internacionales y educativas expanden tus horizontes",
+    "Capricornio": "organizaciones establecidas y estructuradas aumentan tu influencia",
+    "Acuario": "comunidades innovadoras y humanitarias impulsan tu visión",
+    "Piscis": "redes creativas y espirituales inspiran tu prosperidad"
+  };
+  return descriptions[sign] || "tus conexiones sociales diversas te abren importantes oportunidades";
+};
+
+// Monthly tips by sun sign
+const getMonthlyTipBySunSign = (sunSign: string): string => {
+  const tips: { [key: string]: string } = {
+    "Aries": "Este mes, enfócate en establecer metas financieras claras. Tu energía pionera está en su punto máximo, ideal para iniciar nuevos proyectos que generen ingresos. Evita las decisiones impulsivas con grandes sumas de dinero.",
+    "Tauro": "Es un buen momento para revisar tus inversiones a largo plazo. Considera diversificar en activos tangibles que aprecien con el tiempo. Tu paciencia será recompensada si resistes la tentación de gastos innecesarios.",
+    "Géminis": "Aprovecha tu versatilidad este mes para explorar fuentes de ingreso adicionales. Es un excelente momento para educarte en nuevas habilidades financieras. Mantén un registro detallado de tus gastos para evitar sorpresas.",
+    "Cáncer": "Enfócate en la seguridad financiera de tu hogar este mes. Considera establecer o reforzar tu fondo de emergencia. Las inversiones relacionadas con bienes raíces o negocios familiares son favorables ahora.",
+    "Leo": "Tu creatividad está en auge – considera cómo monetizarla. Es un buen momento para inversiones que reflejen tus valores personales. Sé consciente de gastos relacionados con entretenimiento y lujos.",
+    "Virgo": "Este mes favorece la organización y optimización de tus finanzas. Revisa suscripciones y gastos recurrentes para identificar ahorros. Tu capacidad analítica te ayudará a encontrar oportunidades que otros pasan por alto.",
+    "Libra": "Las asociaciones financieras están favorecidas este mes. Considera colaboraciones que balanceen tus habilidades con las de otros. Es buen momento para negociar términos favorables en contratos y acuerdos.",
+    "Escorpio": "Enfócate en eliminar deudas y consolidar recursos. Tu intuición financiera está especialmente aguda, úsala para identificar inversiones con potencial transformador. Mantén la confidencialidad en asuntos financieros.",
+    "Sagitario": "Expande tus horizontes financieros este mes. Educación en finanzas, inversiones internacionales o negocios con alcance global son favorables. Mantén el optimismo pero establece límites claros en tus gastos.",
+    "Capricornio": "La disciplina financiera rinde frutos este mes. Es buen momento para planificación a largo plazo y establecimiento de metas ambiciosas pero realistas. Considera inversiones conservadoras con crecimiento estable.",
+    "Acuario": "Innovación financiera es tu clave este mes. Explora tecnologías emergentes o métodos no convencionales de inversión. Tu visión única puede identificar tendencias futuras con potencial de crecimiento.",
+    "Piscis": "Confía en tu intuición financiera este mes. Conecta tus decisiones monetarias con tus valores más profundos. Establece límites claros en préstamos o ayuda financiera a otros para proteger tus propios recursos."
+  };
+  return tips[sunSign] || "Este mes, alinea tus decisiones financieras con tus valores personales más profundos para manifestar mayor abundancia.";
+};
+
+// Financial strengths by sun sign
+const getFinancialStrengthsBySunSign = (sunSign: string): string => {
+  const strengths: { [key: string]: string } = {
+    "Aries": "iniciativa y capacidad para crear nuevas oportunidades financieras",
+    "Tauro": "paciencia y habilidad para construir seguridad financiera a largo plazo",
+    "Géminis": "adaptabilidad y capacidad para diversificar fuentes de ingreso",
+    "Cáncer": "intuición financiera y habilidad para proteger y nutrir tus recursos",
+    "Leo": "generosidad estratégica y capacidad para atraer abundancia",
+    "Virgo": "análisis detallado y mejora continua de tus finanzas",
+    "Libra": "diplomacia en negociaciones y establecimiento de asociaciones rentables",
+    "Escorpio": "intuición para inversiones y manejo estratégico de recursos compartidos",
+    "Sagitario": "visión expansiva y capacidad para identificar oportunidades de crecimiento",
+    "Capricornio": "disciplina y enfoque para alcanzar metas financieras a largo plazo",
+    "Acuario": "pensamiento innovador y habilidad para anticipar tendencias futuras",
+    "Piscis": "intuición creativa y capacidad para manifestar abundancia desde lo intangible"
+  };
+  return strengths[sunSign] || "tu capacidad única para manifestar abundancia en formas que resuenan con tu esencia";
+};
+
+// Generate income strategies based on natal chart
+const generateIncomeStrategies = (chart: NatalChartData): string[] => {
+  // Base strategies on main planetary positions
+  const sunStrategies = getSunIncomeStrategies(chart.sun.sign);
+  const moonStrategies = getMoonIncomeStrategies(chart.moon.sign);
+  const mercuryStrategies = getMercuryIncomeStrategies(chart.mercury.sign);
+  const venusStrategies = getVenusIncomeStrategies(chart.venus.sign);
+  
+  // Combine strategies (3-5 in total)
+  const allStrategies = [...sunStrategies, ...moonStrategies, ...mercuryStrategies, ...venusStrategies];
+  
+  // Shuffle and select 4 unique strategies
+  return shuffleArray(allStrategies).slice(0, 4);
+};
+
+// Helper functions for income strategies by planet sign
+const getSunIncomeStrategies = (sign: string): string[] => {
+  // Just a few examples per sign
+  const strategies: { [key: string]: string[] } = {
+    "Aries": ["Desarrolla un negocio propio donde puedas liderar e innovar", "Explora roles de ventas competitivas con comisiones"],
+    "Tauro": ["Invierte en bienes raíces para ingreso pasivo a largo plazo", "Considera negocios relacionados con productos de calidad o artesanía"],
+    "Géminis": ["Desarrolla múltiples fuentes de ingreso simultáneas", "Explora trabajos freelance que aprovechen tus habilidades comunicativas"],
+    "Cáncer": ["Considera negocios basados en el hogar o relacionados con necesidades familiares", "Explora el sector inmobiliario o alojamiento"],
+    "Leo": ["Monetiza tus talentos creativos y artísticos", "Busca roles donde tu carisma natural pueda destacar"],
+    "Virgo": ["Ofrece servicios especializados que requieran precisión y análisis", "Considera roles de consultoría donde puedas mejorar la eficiencia de otros"],
+    "Libra": ["Desarrolla asociaciones comerciales estratégicas", "Explora campos relacionados con la belleza, el arte o la diplomacia"],
+    "Escorpio": ["Considera inversiones estratégicas en mercados financieros", "Explora roles que involucren investigación profunda o transformación"],
+    "Sagitario": ["Busca oportunidades con alcance internacional", "Considera roles educativos o de publicación"],
+    "Capricornio": ["Desarrolla un plan de carrera estructurado con metas claras", "Invierte en tu educación para roles de alto nivel"],
+    "Acuario": ["Explora tecnologías emergentes o nichos innovadores", "Considera roles que involucren redes y comunidades"],
+    "Piscis": ["Monetiza tus talentos artísticos o intuitivos", "Considera roles relacionados con la sanación o ayuda a otros"]
+  };
+  return strategies[sign] || ["Desarrolla una estrategia de ingresos que te permita expresar tus talentos naturales"];
+};
+
+const getMoonIncomeStrategies = (sign: string): string[] => {
+  // Simplified for brevity
+  const strategies: { [key: string]: string[] } = {
+    "Aries": ["Busca roles donde puedas iniciar proyectos con entusiasmo", "Considera trabajos que ofrezcan variedad y desafíos constantes"],
+    "Tauro": ["Desarrolla fuentes de ingreso estables y predecibles", "Considera roles relacionados con finanzas o recursos materiales"],
+    "Géminis": ["Aprovecha tu adaptabilidad emocional en entornos cambiantes", "Explora roles que combinen comunicación y servicio al cliente"],
+    "Cáncer": ["Desarrolla negocios que satisfagan necesidades emocionales o de cuidado", "Considera roles relacionados con nutrición o bienestar"],
+    "Leo": ["Busca reconocimiento por tu trabajo creativo o de liderazgo", "Considera roles donde puedas inspirar a otros"],
+    "Virgo": ["Ofrece servicios que requieran atención al detalle", "Desarrolla sistemas para mejorar la eficiencia de otros"],
+    "Libra": ["Crea un entorno de trabajo armonioso y estéticamente agradable", "Explora mediación o resolución de conflictos"],
+    "Escorpio": ["Aprovecha tu intuición emocional para transformaciones profundas", "Considera roles relacionados con recursos compartidos o crisis"],
+    "Sagitario": ["Busca trabajo que te permita explorar y expandir horizontes", "Considera roles inspiradores o motivacionales"],
+    "Capricornio": ["Desarrolla disciplina emocional en tus finanzas", "Busca roles donde tu responsabilidad sea valorada"],
+    "Acuario": ["Innova en comunidades o grupos", "Considera roles relacionados con causas humanitarias"],
+    "Piscis": ["Monetiza tus habilidades intuitivas o compasivas", "Considera roles artísticos o de sanación"]
+  };
+  return strategies[sign] || ["Desarrolla una estrategia de ingresos que honre tus necesidades emocionales"];
+};
+
+const getMercuryIncomeStrategies = (sign: string): string[] => {
+  // Simplified for brevity
+  const strategies: { [key: string]: string[] } = {
+    "Aries": ["Comunica ideas con energía y entusiasmo", "Desarrolla contenido que inspire acción rápida"],
+    "Tauro": ["Comunica valor y calidad en tus ofertas", "Desarrolla contenido práctico y confiable"],
+    "Géminis": ["Aprovecha tu versatilidad comunicativa", "Explora roles que requieran adaptabilidad mental"],
+    "Cáncer": ["Comunica con empatía y cuidado", "Desarrolla contenido que nutra y apoye a otros"],
+    "Leo": ["Comunica con creatividad y entusiasmo", "Desarrolla presentaciones o discursos inspiradores"],
+    "Virgo": ["Ofrece análisis detallado y soluciones prácticas", "Desarrolla sistemas de organización para otros"],
+    "Libra": ["Comunica con diplomacia y equilibrio", "Facilita diálogos constructivos entre partes"],
+    "Escorpio": ["Investiga y comunica verdades profundas", "Desarrolla contenido transformador"],
+    "Sagitario": ["Expande horizontes a través de la comunicación", "Enseña o publica sobre temas que te apasionan"],
+    "Capricornio": ["Comunica con autoridad y estructura", "Desarrolla sistemas de comunicación eficientes"],
+    "Acuario": ["Comunica ideas innovadoras y visionarias", "Desarrolla redes y comunidades de pensamiento"],
+    "Piscis": ["Comunica con imaginación y compasión", "Desarrolla narrativas que inspiren y eleven"]
+  };
+  return strategies[sign] || ["Aprovecha tu estilo único de comunicación para crear valor para otros"];
+};
+
+const getVenusIncomeStrategies = (sign: string): string[] => {
+  // Simplified for brevity
+  const strategies: { [key: string]: string[] } = {
+    "Aries": ["Crea experiencias emocionantes para clientes", "Introduce novedades en tus ofertas regularmente"],
+    "Tauro": ["Crea experiencias sensoriales de calidad", "Invierte en belleza y comodidad en tu entorno laboral"],
+    "Géminis": ["Crea conexiones sociales diversas", "Comunica los beneficios de tus servicios claramente"],
+    "Cáncer": ["Crea experiencias que generen seguridad emocional", "Ofrece servicios que cuiden y protejan a otros"],
+    "Leo": ["Crea experiencias memorables y dramáticas", "Añade un toque de lujo a tus ofertas"],
+    "Virgo": ["Mejora constantemente la calidad de tus servicios", "Ofrece soluciones prácticas con un toque especial"],
+    "Libra": ["Crea belleza y armonía en todo lo que ofreces", "Desarrolla asociaciones equilibradas y mutuamente beneficiosas"],
+    "Escorpio": ["Crea experiencias intensas y transformadoras", "Ofrece valor profundo en tus servicios"],
+    "Sagitario": ["Crea experiencias que expandan horizontes", "Incorpora elementos internacionales o educativos en tus servicios"],
+    "Capricornio": ["Ofrece calidad duradera y atemporal", "Construye una reputación sólida en tu campo"],
+    "Acuario": ["Innova en relaciones y conexiones", "Ofrece servicios únicos y vanguardistas"],
+    "Piscis": ["Crea experiencias mágicas y trascendentes", "Incorpora arte y belleza en todo lo que ofreces"]
+  };
+  return strategies[sign] || ["Aprovecha tu sentido innato de lo que otros valoran para crear ofertas atractivas"];
+};
+
+// Generate career recommendations based on natal chart
+const generateCareerRecommendations = (chart: NatalChartData): string[] => {
+  // Base career recommendations on House 10 and key planets
+  const house10Sign = findHouseSign(chart, 10);
+  const sunSign = chart.sun.sign;
+  const marsSign = chart.mars.sign;
+  
+  // Get recommendations
+  const house10Careers = getHouse10Careers(house10Sign);
+  const sunCareers = getSunCareers(sunSign);
+  const marsCareers = getMarsCareers(marsSign);
+  
+  // Combine and select unique recommendations
+  const allCareers = [...house10Careers, ...sunCareers, ...marsCareers];
+  
+  // Return 4 unique careers
+  return shuffleArray(allCareers).slice(0, 4);
+};
+
+// Helper functions for career recommendations
+const getHouse10Careers = (sign: string): string[] => {
+  const careers: { [key: string]: string[] } = {
+    "Aries": ["Emprendimiento", "Deportes o entrenamiento físico", "Ventas competitivas", "Liderazgo en startups"],
+    "Tauro": ["Finanzas y banca", "Agricultura o alimentación sostenible", "Artes aplicadas", "Gestión de recursos"],
+    "Géminis": ["Comunicaciones", "Educación", "Ventas", "Tecnología de la información"],
+    "Cáncer": ["Hostelería", "Bienes raíces", "Nutrición", "Cuidado infantil o familiar"],
+    "Leo": ["Artes escénicas", "Educación", "Gestión de marca", "Relaciones públicas"],
+    "Virgo": ["Salud y bienestar", "Análisis de datos", "Consultoría de mejoras", "Edición o redacción técnica"],
+    "Libra": ["Derecho", "Diseño", "Diplomacia", "Gestión de relaciones"],
+    "Escorpio": ["Investigación", "Psicología", "Finanzas de inversión", "Gestión de crisis"],
+    "Sagitario": ["Educación superior", "Publicaciones", "Derecho internacional", "Turismo"],
+    "Capricornio": ["Administración ejecutiva", "Planificación financiera", "Arquitectura", "Roles gubernamentales"],
+    "Acuario": ["Tecnología", "Ciencias", "Trabajo humanitario", "Innovación social"],
+    "Piscis": ["Artes", "Psicología", "Cuidado de la salud", "Espiritualidad"]
+  };
+  return careers[sign] || ["Carrera alineada con tus valores", "Roles que utilicen tus talentos únicos"];
+};
+
+const getSunCareers = (sign: string): string[] => {
+  // Similar structure to above, but focused on sun sign qualities
+  const careers: { [key: string]: string[] } = {
+    "Aries": ["Emprendimiento independiente", "Asesoría en liderazgo", "Desarrollo de productos innovadores"],
+    "Tauro": ["Inversiones a largo plazo", "Artes culinarias", "Gestión de recursos naturales"],
+    "Géminis": ["Periodismo", "Marketing digital", "Enseñanza de idiomas"],
+    "Cáncer": ["Terapia familiar", "Desarrollo comunitario", "Industria alimentaria"],
+    "Leo": ["Dirección creativa", "Desarrollo de talento", "Entretenimiento"],
+    "Virgo": ["Análisis y mejora de sistemas", "Salud preventiva", "Gestión de calidad"],
+    "Libra": ["Mediación", "Relaciones públicas", "Diseño de interiores"],
+    "Escorpio": ["Investigación estratégica", "Transformación empresarial", "Psicología profunda"],
+    "Sagitario": ["Publicaciones", "Desarrollo internacional", "Filosofía aplicada"],
+    "Capricornio": ["Planificación estratégica", "Inversiones conservadoras", "Consultoría de negocios"],
+    "Acuario": ["Innovación tecnológica", "Reformas sociales", "Desarrollo de comunidades"],
+    "Piscis": ["Artes visuales", "Música", "Counseling espiritual"]
+  };
+  return careers[sign] || ["Roles que destaquen tu autenticidad", "Carreras alineadas con tu propósito vital"];
+};
+
+const getMarsCareers = (sign: string): string[] => {
+  // Mars influences how we take action and assert ourselves
+  const careers: { [key: string]: string[] } = {
+    "Aries": ["Emprendimiento independiente", "Deportes competitivos", "Ventas agresivas"],
+    "Tauro": ["Construcción", "Agricultura", "Seguridad financiera"],
+    "Géminis": ["Debate", "Periodismo de investigación", "Ventas técnicas"],
+    "Cáncer": ["Protección familiar o comunitaria", "Seguridad alimentaria", "Bienes raíces"],
+    "Leo": ["Liderazgo creativo", "Desarrollo de talentos", "Coaching"],
+    "Virgo": ["Optimización de procesos", "Análisis crítico", "Medicina preventiva"],
+    "Libra": ["Negociación estratégica", "Defensa legal", "Relaciones internacionales"],
+    "Escorpio": ["Investigación profunda", "Gestión de crisis", "Transformación corporativa"],
+    "Sagitario": ["Aventura y exploración", "Expansión internacional", "Educación superior"],
+    "Capricornio": ["Logro estructurado", "Escalada corporativa", "Administración disciplinada"],
+    "Acuario": ["Activismo", "Innovación tecnológica", "Reforma social"],
+    "Piscis": ["Acción inspirada", "Servicio compasivo", "Artes performativas"]
+  };
+  return careers[sign] || ["Roles que canalicen tu energía natural", "Carreras donde puedas liderar a tu manera"];
+};
+
+// Generate tips for attracting opportunities
+const generateOpportunityAttractionTips = (chart: NatalChartData): string[] => {
+  // Base tips on Venus, Jupiter and North Node
+  const venusSign = chart.venus.sign;
+  const jupiterSign = chart.jupiter.sign;
+  const moonSign = chart.moon.sign;
+  
+  // Get tips
+  const venusTips = getVenusAttractionTips(venusSign);
+  const jupiterTips = getJupiterAttractionTips(jupiterSign);
+  const moonTips = getMoonAttractionTips(moonSign);
+  
+  // Combine and select unique tips
+  const allTips = [...venusTips, ...jupiterTips, ...moonTips];
+  
+  // Return 4 unique tips
+  return shuffleArray(allTips).slice(0, 4);
+};
+
+// Helper functions for opportunity attraction tips
+const getVenusAttractionTips = (sign: string): string[] => {
+  const tips: { [key: string]: string[] } = {
+    "Aries": ["Muestra entusiasmo y energía en tus propuestas", "Destaca tu capacidad para tomar iniciativa rápidamente"],
+    "Tauro": ["Demuestra confiabilidad y consistencia", "Crea un entorno de trabajo estéticamente agradable"],
+    "Géminis": ["Comunica claramente los beneficios de tus servicios", "Cultiva una red diversa de contactos profesionales"],
+    "Cáncer": ["Crea conexiones emocionales genuinas con clientes/colegas", "Ofrece un entorno que genere sensación de seguridad"],
+    "Leo": ["Presenta tus ofertas con creatividad y dramatismo", "Cultiva una presencia personal magnética y generosa"],
+    "Virgo": ["Destaca la calidad y atención al detalle en tu trabajo", "Ofrece soluciones prácticas que mejoren la vida de otros"],
+    "Libra": ["Cultiva asociaciones estratégicas equilibradas", "Crea belleza y armonía en tus ofertas"],
+    "Escorpio": ["Ofrece valor transformador en tus servicios", "Cultiva lealtad profunda en tus relaciones profesionales"],
+    "Sagitario": ["Amplía tus horizontes y conexiones internacionales", "Comparte conocimiento valioso generosamente"],
+    "Capricornio": ["Proyecta profesionalismo y confiabilidad", "Construye una reputación sólida a largo plazo"],
+    "Acuario": ["Destaca lo único e innovador de tus ofertas", "Conecta con comunidades que compartan tus valores"],
+    "Piscis": ["Infunde tus servicios con belleza y compasión", "Cultiva tu intuición para identificar oportunidades invisibles"]
+  };
+  return tips[sign] || ["Cultiva relaciones de valor mutuo", "Ofrece siempre más valor del que recibes"];
+};
+
+const getJupiterAttractionTips = (sign: string): string[] => {
+  const tips: { [key: string]: string[] } = {
+    "Aries": ["Expande tu alcance con iniciativas audaces", "Lidera el camino en territorios inexplorados"],
+    "Tauro": ["Cultiva una mentalidad de abundancia práctica", "Invierte en crecimiento sostenible a largo plazo"],
+    "Géminis": ["Expande tu educación continuamente", "Comunica tus ideas en diversos formatos y plataformas"],
+    "Cáncer": ["Nutre tu red de contactos como una familia extendida", "Expande tu seguridad emocional y financiera simultáneamente"],
+    "Leo": ["Comparte tus talentos con generosidad", "Cultiva conexiones con personas influyentes y creativas"],
+    "Virgo": ["Mejora continuamente tus habilidades y servicios", "Expande tu capacidad para ayudar y servir a otros"],
+    "Libra": ["Cultiva asociaciones que expandan tu alcance", "Busca el equilibrio entre dar y recibir"],
+    "Escorpio": ["Transforma limitaciones en oportunidades", "Invierte estratégicamente en recursos compartidos"],
+    "Sagitario": ["Adopta una visión global en tus emprendimientos", "Busca oportunidades que expandan tus horizontes"],
+    "Capricornio": ["Construye estructuras que permitan crecimiento sostenible", "Cultiva paciencia para logros significativos"],
+    "Acuario": ["Conecta con redes y comunidades visionarias", "Adopta innovaciones que expandan tu alcance"],
+    "Piscis": ["Confía en tu intuición para guiar tu expansión", "Cultiva compasión como vía hacia la abundancia"]
+  };
+  return tips[sign] || ["Mantén una mentalidad de abundancia", "Busca oportunidades de crecimiento continuo"];
+};
+
+const getMoonAttractionTips = (sign: string): string[] => {
+  const tips: { [key: string]: string[] } = {
+    "Aries": ["Cultiva confianza en tus instintos financieros", "Manifiesta tus deseos con intención clara"],
+    "Tauro": ["Crea rituales de abundancia que nutran tu seguridad", "Visualiza crecimiento constante y estable"],
+    "Géminis": ["Comunica tus necesidades con claridad", "Adapta tus estrategias según la retroalimentación emocional"],
+    "Cáncer": ["Cuida tu bienestar como fundamento de tu prosperidad", "Crea un hogar que apoye tus metas financieras"],
+    "Leo": ["Celebra cada logro con genuino aprecio", "Reconoce tu valor inherente más allá de tus logros"],
+    "Virgo": ["Purifica tus emociones negativas sobre el dinero", "Establece sistemas que apoyen tu bienestar financiero"],
+    "Libra": ["Cultiva relaciones que apoyen tu crecimiento", "Busca el equilibrio entre dar y recibir"],
+    "Escorpio": ["Transforma patrones emocionales limitantes", "Profundiza en tu relación con la abundancia"],
+    "Sagitario": ["Expande tus creencias sobre lo que mereces", "Mantén optimismo mientras tomas acciones concretas"],
+    "Capricornio": ["Construye seguridad emocional junto con seguridad material", "Establece estructuras que apoyen tu bienestar"],
+    "Acuario": ["Conecta con comunidades que compartan tus valores", "Innova en tu aproximación al bienestar integral"],
+    "Piscis": ["Confía en tu intuición financiera", "Visualiza la abundancia fluyendo hacia ti naturalmente"]
+  };
+  return tips[sign] || ["Alinea tus finanzas con tus necesidades emocionales", "Cultiva autocompasión en tu viaje hacia la abundancia"];
+};
+
+// Generate financial calendar
+const generateFinancialCalendar = (chart: NatalChartData): any[] => {
+  // In a real implementation, this would calculate actual planetary transits
+  // For now, we'll create a simplified version with made-up but plausible dates
+  
+  const calendar = [];
+  const currentDate = new Date();
+  
+  // Generate 6 entries for the next 3 months
+  for (let i = 0; i < 6; i++) {
+    // Calculate a date between now and 3 months from now
+    const futureDate = addDays(currentDate, 10 + (i * 15)); // Spread events roughly every 15 days
+    
+    // Format the date
+    const formattedDate = format(futureDate, 'd MMMM yyyy', { locale: es });
+    
+    // Determine transit type based on index
+    let transitType;
+    let recommendation;
+    
+    if (i % 3 === 0) {
+      // Jupiter transit (expansion)
+      transitType = "Tránsito de Júpiter";
+      recommendation = generateJupiterTransitRecommendation(chart);
+    } else if (i % 3 === 1) {
+      // Mercury retrograde or direct
+      transitType = i < 3 ? "Mercurio Retrógrado" : "Mercurio Directo";
+      recommendation = generateMercuryTransitRecommendation(chart, i < 3);
+    } else {
+      // Venus transit (values, relationships)
+      transitType = "Tránsito de Venus";
+      recommendation = generateVenusTransitRecommendation(chart);
+    }
+    
+    calendar.push({
+      date: formattedDate,
+      transitType,
+      recommendation
+    });
+  }
+  
+  return calendar;
+};
+
+// Helper functions for transit recommendations
+const generateJupiterTransitRecommendation = (chart: NatalChartData): string => {
+  const recommendations = [
+    "Excelente momento para expandir tus inversiones. Considera nuevas oportunidades en áreas relacionadas con tu Casa 2.",
+    "Período favorable para educación financiera o buscar mentores. Tu comprensión de oportunidades se expande significativamente.",
+    "Momento ideal para lanzar un nuevo proyecto o negocio. La energía expansiva apoya nuevos comienzos financieros.",
+    "Oportunidad para conexiones profesionales significativas. Networking activo puede abrir puertas importantes.",
+    "Favorable para revisar tu filosofía financiera y alinearla con tu visión a largo plazo."
+  ];
+  
+  return recommendations[Math.floor(Math.random() * recommendations.length)];
+};
+
+const generateMercuryTransitRecommendation = (chart: NatalChartData, isRetrograde: boolean): string => {
+  if (isRetrograde) {
+    const recommendations = [
+      "Período para revisar contratos y acuerdos financieros. No firmes documentos importantes hasta después del retrógrado.",
+      "Momento ideal para reevaluar presupuestos y planificación financiera. Corrige errores en registros o cuentas.",
+      "Reconsideración de decisiones financieras recientes recomendada. Puede revelarse información anteriormente oculta.",
+      "Favorable para reconectar con contactos profesionales del pasado que podrían ofrecer nuevas oportunidades.",
+      "Tiempo de introspección sobre patrones de gasto. Identifica áreas de mejora en tu gestión financiera."
+    ];
+    return recommendations[Math.floor(Math.random() * recommendations.length)];
+  } else {
+    const recommendations = [
+      "Comunicaciones financieras fluyen libremente. Excelente momento para negociaciones y acuerdos.",
+      "Favorable para implementar nuevos sistemas de organización financiera o herramientas de gestión.",
+      "Momento propicio para aprendizaje financiero y adquisición de nuevas habilidades monetarias.",
+      "Claridad mental para tomar decisiones financieras. Considera opciones que has estado evaluando.",
+      "Excelente período para networking profesional y conexiones que beneficien tu carrera."
+    ];
+    return recommendations[Math.floor(Math.random() * recommendations.length)];
+  }
+};
+
+const generateVenusTransitRecommendation = (chart: NatalChartData): string => {
+  const recommendations = [
+    "Favorable para atraer recursos y oportunidades. Tu magnetismo personal está aumentado para manifestar abundancia.",
+    "Excelente momento para mejorar la presentación de tus servicios o productos. La estética impacta positivamente tus ganancias.",
+    "Período para cultivar relaciones profesionales armoniosas. Asociaciones beneficiosas pueden formarse ahora.",
+    "Momento para evaluar qué realmente valoras en tu carrera y finanzas. Alinea tus acciones con tus valores.",
+    "Propicio para inversiones en arte, belleza o experiencias que nutran tu bienestar mientras aprecian en valor."
+  ];
+  
+  return recommendations[Math.floor(Math.random() * recommendations.length)];
+};
+
+// Generate action plan
+const generateActionPlan = (chart: NatalChartData): any[] => {
+  // In a real implementation, this would analyze the chart in depth
+  // For now, we'll create a simplified version with actionable recommendations
+  
+  // Extract key positions for personalization
+  const sunSign = chart.sun.sign;
+  const house2Sign = findHouseSign(chart, 2);
+  const jupiterSign = chart.jupiter.sign;
+  const jupiterHouse = chart.jupiter.house;
+  
+  // Create action plan with 5 steps
   return [
     {
-      date: "15-20 Noviembre 2023",
-      transitType: "Luna Nueva en Escorpio",
-      recommendation: "Excelente momento para iniciar un proyecto financiero o hacer una inversión importante."
+      title: "Clarifica tu Relación con el Dinero",
+      description: `Dedica tiempo a reflexionar sobre tus creencias acerca del dinero. Con tu Casa 2 en ${house2Sign}, beneficiarte de ${getHouse2Action(house2Sign)}.`,
+      timing: "Próximos 7 días"
     },
     {
-      date: "5-10 Diciembre 2023",
-      transitType: "Mercurio directo",
-      recommendation: "Ideal para firmar contratos, negociar acuerdos o lanzar productos/servicios."
+      title: "Aprovecha tu Zona de Expansión",
+      description: `Con Júpiter en ${jupiterSign} en tu Casa ${jupiterHouse}, enfoca tu energía en actividades relacionadas con ${getJupiterAction(jupiterSign, jupiterHouse)}.`,
+      timing: "Este mes"
     },
     {
-      date: "22-28 Diciembre 2023",
-      transitType: "Júpiter en Tauro",
-      recommendation: "Período favorable para inversiones inmobiliarias o empresas relacionadas con bienes materiales."
+      title: "Alinea tus Talentos con Ingresos",
+      description: `Como ${sunSign}, tienes talentos naturales en ${getSunTalents(sunSign)}. Identifica cómo estos pueden traducirse en fuentes de ingreso alineadas con tu esencia.`,
+      timing: "Próximas 2-3 semanas"
     },
     {
-      date: "3-10 Enero 2024",
-      transitType: "Venus en Capricornio",
-      recommendation: "Buen momento para establecer asociaciones comerciales duraderas o solicitar financiamiento."
+      title: "Establece Sistema de Gestión Financiera",
+      description: "Crea un sistema para seguimiento de ingresos, gastos, ahorros e inversiones. La claridad financiera es el primer paso hacia mayor abundancia.",
+      timing: "Inmediatamente"
     },
     {
-      date: "20-25 Enero 2024",
-      transitType: "Luna Llena en Leo",
-      recommendation: "Óptimo para presentaciones públicas, lanzamientos o para promover tu marca personal."
+      title: "Desarrolla Red de Prosperidad",
+      description: "Conecta intencionalmente con personas que inspiren tu crecimiento financiero. Busca mentores o grupos que compartan tus valores y aspiraciones.",
+      timing: "Continuamente"
     }
   ];
 };
 
-// Helper functions to generate sign-specific advice
-
-const getSignMoneyAttribute = (sign: string): string => {
-  const attributes: {[key: string]: string} = {
-    "Aries": "impulsiva y valiente, buscando oportunidades de rápido crecimiento",
-    "Tauro": "estable y persistente, valorando la seguridad a largo plazo",
-    "Géminis": "diversificada y adaptable, con múltiples fuentes de ingresos",
-    "Cáncer": "protectora y cíclica, enfocada en la seguridad familiar",
-    "Leo": "generosa y ambiciosa, atraída por inversiones que reflejan tu estatus",
-    "Virgo": "analítica y detallista, con excelente capacidad de ahorro y organización",
-    "Libra": "equilibrada y estética, buscando armonía en tus finanzas",
-    "Escorpio": "intensa y estratégica, con talento para transformar recursos",
-    "Sagitario": "expansiva y optimista, atrayendo oportunidades de crecimiento",
-    "Capricornio": "disciplinada y paciente, construyendo riqueza a largo plazo",
-    "Acuario": "innovadora e independiente, abierta a fuentes de ingresos no convencionales",
-    "Piscis": "intuitiva y receptiva, con capacidad para atraer recursos de forma inesperada"
+// Helper functions for action plan
+const getHouse2Action = (sign: string): string => {
+  const actions: { [key: string]: string } = {
+    "Aries": "adoptar un enfoque más proactivo en la generación de ingresos",
+    "Tauro": "establecer sistemas financieros sólidos y confiables",
+    "Géminis": "diversificar tus fuentes de ingreso y adaptarte a nuevas oportunidades",
+    "Cáncer": "nutrir tu seguridad financiera con atención continua",
+    "Leo": "reconocer el valor de tu creatividad y generosidad estratégica",
+    "Virgo": "analizar y perfeccionar constantemente tus sistemas financieros",
+    "Libra": "establecer asociaciones financieras equilibradas y justas",
+    "Escorpio": "transformar tu relación con recursos compartidos y deuda",
+    "Sagitario": "expandir tu comprensión y filosofía sobre el dinero",
+    "Capricornio": "establecer metas financieras estructuradas a largo plazo",
+    "Acuario": "adoptar enfoques innovadores y no convencionales hacia las finanzas",
+    "Piscis": "confiar en tu intuición financiera mientras estableces límites claros"
   };
-  
-  return attributes[sign] || "equilibrada y en desarrollo";
+  return actions[sign] || "desarrollar una comprensión profunda de tu relación única con el dinero";
 };
 
-const getCareerAttributeBySign = (sign: string): string => {
-  const attributes: {[key: string]: string} = {
-    "Aries": "liderar, innovar y tomar iniciativas",
-    "Tauro": "crear valor tangible y construir con solidez",
-    "Géminis": "comunicar, enseñar y conectar ideas",
-    "Cáncer": "nutrir, proteger y crear ambientes seguros",
-    "Leo": "brillar, inspirar y estar en el centro de atención",
-    "Virgo": "analizar, optimizar y perfeccionar procesos",
-    "Libra": "mediar, armonizar y crear belleza",
-    "Escorpio": "investigar, transformar y profundizar",
-    "Sagitario": "expandir horizontes, enseñar y explorar",
-    "Capricornio": "estructurar, liderar y construir legados",
-    "Acuario": "innovar, reformar y crear comunidad",
-    "Piscis": "inspirar, sanar y conectar con lo intangible"
+const getJupiterAction = (sign: string, house: number): string => {
+  const signActions: { [key: string]: string } = {
+    "Aries": "iniciar nuevos proyectos con entusiasmo y liderazgo",
+    "Tauro": "construir valor tangible y seguridad a largo plazo",
+    "Géminis": "expandir tu conocimiento y comunicación en diversos campos",
+    "Cáncer": "nutrir conexiones significativas y seguridad emocional",
+    "Leo": "expresar tu creatividad y generosidad de manera expansiva",
+    "Virgo": "mejorar sistemas y ofrecer servicio valioso a otros",
+    "Libra": "crear asociaciones armoniosas y colaboraciones estratégicas",
+    "Escorpio": "transformar profundamente recursos compartidos e inversiones",
+    "Sagitario": "expandir horizontes a través de viajes, educación o publicaciones",
+    "Capricornio": "construir estructuras sólidas para crecimiento a largo plazo",
+    "Acuario": "innovar y conectar con comunidades visionarias",
+    "Piscis": "expandir tu comprensión espiritual e intuición creativa"
   };
   
-  return attributes[sign] || "expresar tus talentos únicos";
+  // Combine sign influence with house area for more specific guidance
+  const signAction = signActions[sign] || "expandir con optimismo en áreas resonantes";
+  const houseArea = getHouseArea(house);
+  
+  return `${signAction} en el área de ${houseArea}`;
 };
 
-const getJupiterExpansionBySign = (sign: string): string => {
-  const expansions: {[key: string]: string} = {
-    "Aries": "tomas iniciativa y lideras nuevos proyectos",
-    "Tauro": "inviertes en activos tangibles y construyes seguridad",
-    "Géminis": "diversificas tus conocimientos y redes de contacto",
-    "Cáncer": "nutres tus relaciones y bases emocionales",
-    "Leo": "expresas tu creatividad y liderazgo auténtico",
-    "Virgo": "perfeccionas tus habilidades y optimizas sistemas",
-    "Libra": "estableces alianzas estratégicas y colaboraciones",
-    "Escorpio": "transformas recursos compartidos y profundizas inversiones",
-    "Sagitario": "amplías tus horizontes y tomas riesgos calculados",
-    "Capricornio": "asumes responsabilidades y construyes estructuras sólidas",
-    "Acuario": "innovas y te conectas con comunidades afines",
-    "Piscis": "confías en tu intuición y te conectas con tu propósito espiritual"
+const getHouseArea = (house: number): string => {
+  const areas: { [key: number]: string } = {
+    1: "tu identidad y proyección personal",
+    2: "tus recursos y valores personales",
+    3: "comunicación y aprendizaje",
+    4: "hogar y fundaciones",
+    5: "creatividad y autoexpresión",
+    6: "trabajo diario y salud",
+    7: "relaciones y asociaciones",
+    8: "transformación y recursos compartidos",
+    9: "expansión y visión de vida",
+    10: "carrera y reconocimiento público",
+    11: "redes y visiones futuras",
+    12: "intuición y conexión espiritual"
   };
-  
-  return expansions[sign] || "sigues tu verdadera pasión";
+  return areas[house] || "tu vida";
 };
 
-const getHouse2IncomeSourceBySign = (sign: string): string => {
-  const sources: {[key: string]: string} = {
-    "Aries": "emprendimientos propios, liderazgo y actividades que requieren iniciativa y coraje",
-    "Tauro": "inversiones estables, bienes raíces y actividades relacionadas con recursos materiales o belleza",
-    "Géminis": "comunicación, escritura, enseñanza y actividades que requieren versatilidad mental",
-    "Cáncer": "negocios familiares, bienes raíces y actividades relacionadas con nutrición o cuidado",
-    "Leo": "expresión creativa, entretenimiento y roles de liderazgo donde puedas brillar",
-    "Virgo": "análisis, organización, optimización de sistemas y atención al detalle",
-    "Libra": "asociaciones, diplomacia, diseño y actividades relacionadas con la estética o la armonía",
-    "Escorpio": "investigación, transformación de recursos y manejo de fondos compartidos o inversiones",
-    "Sagitario": "educación, viajes, publicaciones y expansión de conocimientos",
-    "Capricornio": "administración, estructura, estrategia a largo plazo y posiciones de autoridad",
-    "Acuario": "innovación, tecnología, trabajo en equipo y causas humanitarias",
-    "Piscis": "creatividad, sanación, espiritualidad y actividades que requieren intuición"
+const getSunTalents = (sign: string): string => {
+  const talents: { [key: string]: string } = {
+    "Aries": "liderazgo, iniciativa y capacidad pionera",
+    "Tauro": "persistencia, practicidad y creación de valor tangible",
+    "Géminis": "comunicación, adaptabilidad y curiosidad intelectual",
+    "Cáncer": "intuición emocional, nutrición y creación de seguridad",
+    "Leo": "creatividad, carisma y capacidad de inspirar",
+    "Virgo": "análisis, perfeccionamiento y mejora de sistemas",
+    "Libra": "diplomacia, sentido estético y creación de armonía",
+    "Escorpio": "percepción profunda, investigación y transformación",
+    "Sagitario": "visión expansiva, optimismo y exploración",
+    "Capricornio": "estructuración, responsabilidad y visión a largo plazo",
+    "Acuario": "innovación, pensamiento progresista y creación de comunidad",
+    "Piscis": "imaginación, compasión y conexión intuitiva"
   };
-  
-  return sources[sign] || "actividades que resonan con tus valores personales";
+  return talents[sign] || "tus dones y talentos únicos";
 };
 
-const getPlanetaryInfluenceOnMoney = (planets: Array<{name: string, data: any}>): string => {
-  if (planets.length === 0) return "";
-  
-  const influences: {[key: string]: string} = {
-    "Sol": "aumenta tu confianza para generar ingresos a través de tu identidad y propósito",
-    "Luna": "conecta tus ingresos con tus necesidades emocionales y fluctuaciones cíclicas",
-    "Mercurio": "potencia tu capacidad de generar dinero a través de la comunicación e ideas",
-    "Venus": "favorece la atracción de recursos a través de relaciones y apreciación de valor",
-    "Marte": "impulsa tu capacidad para tomar acción directa para generar ingresos",
-    "Júpiter": "expande significativamente tus oportunidades para generar abundancia",
-    "Saturno": "aporta estructura y disciplina a tus finanzas, aunque puede requerir esfuerzo",
-    "Urano": "indica potencial para ingresos inesperados o a través de métodos innovadores",
-    "Neptuno": "sugiere ingresos a través de creatividad o actividades espirituales, aunque con posible confusión",
-    "Plutón": "potencia la capacidad de transformar recursos y generar riqueza profunda"
-  };
-  
-  if (planets.length === 1) {
-    return influences[planets[0].name] || "";
+// Utility function to shuffle an array (Fisher-Yates algorithm)
+const shuffleArray = <T>(array: T[]): T[] => {
+  const result = [...array];
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
   }
-  
-  return "crea una dinámica compleja en tu relación con el dinero, combinando diversas energías planetarias";
+  return result;
 };
-
-const getHouse10CareerPathBySign = (sign: string): string => {
-  const paths: {[key: string]: string} = {
-    "Aries": "roles de liderazgo, emprendimiento, deportes o carreras que requieren iniciativa y competitividad",
-    "Tauro": "finanzas, arte, gastronomía o carreras estables que involucran recursos tangibles",
-    "Géminis": "comunicación, periodismo, ventas o carreras que requieren versatilidad intelectual",
-    "Cáncer": "cuidado, nutrición, bienes raíces o carreras relacionadas con la familia o la seguridad",
-    "Leo": "entretenimiento, liderazgo creativo, educación o roles donde puedas brillar y ser reconocido",
-    "Virgo": "análisis, salud, optimización o carreras que requieren precisión y servicio",
-    "Libra": "derecho, mediación, diseño o carreras que involucran equilibrio y relaciones",
-    "Escorpio": "investigación, psicología, finanzas o carreras que implican transformación y profundidad",
-    "Sagitario": "educación superior, viajes, filosofía o carreras que expanden horizontes",
-    "Capricornio": "administración, política, negocios o carreras con estructuras jerárquicas claras",
-    "Acuario": "tecnología, causas sociales, innovación o carreras orientadas al futuro",
-    "Piscis": "artes, sanación, espiritualidad o carreras que requieren compasión e intuición"
-  };
-  
-  return paths[sign] || "profesiones que resuenan con tu autenticidad";
-};
-
-const getPlanetaryInfluenceOnCareer = (planets: Array<{name: string, data: any}>): string => {
-  if (planets.length === 0) return "";
-  
-  const influences: {[key: string]: string} = {
-    "Sol": "tu carrera está fuertemente ligada a tu identidad y propósito de vida",
-    "Luna": "tu profesión ideal debe satisfacer tus necesidades emocionales y puede fluctuar con el tiempo",
-    "Mercurio": "la comunicación y el intelecto son centrales en tu camino profesional",
-    "Venus": "las relaciones y la estética juegan un papel importante en tu carrera",
-    "Marte": "la competitividad y la capacidad de acción directa impulsan tu éxito profesional",
-    "Júpiter": "tienes potencial para gran expansión y reconocimiento en tu carrera",
-    "Saturno": "tu camino profesional requiere disciplina y estructuras sólidas para alcanzar logros duraderos",
-    "Urano": "tu carrera puede tomar giros inesperados y beneficiarse de enfoques innovadores",
-    "Neptuno": "tu profesión ideal involucra inspiración, creatividad o dimensiones espirituales",
-    "Plutón": "tu carrera implica transformación, poder y potencial para impacto profundo"
-  };
-  
-  if (planets.length === 1) {
-    return influences[planets[0].name] || "";
-  }
-  
-  return "tu camino profesional está influenciado por múltiples energías planetarias, creando una vocación compleja y multifacética";
-};
-
-const getJupiterFinancialGrowthBySign = (sign: string): string => {
-  const growth: {[key: string]: string} = {
-    "Aries": "proyectos pioneros donde puedas liderar e innovar",
-    "Tauro": "inversiones estables y creación de valor tangible",
-    "Géminis": "comunicación, networking y aprendizaje constante",
-    "Cáncer": "negocios familiares y creación de seguridad emocional",
-    "Leo": "expresión creativa y desarrollo de tu marca personal",
-    "Virgo": "mejora continua de habilidades y optimización de recursos",
-    "Libra": "asociaciones estratégicas y colaboraciones equilibradas",
-    "Escorpio": "inversiones conjuntas y transformación de recursos",
-    "Sagitario": "expansión internacional y educación superior",
-    "Capricornio": "estructuras sólidas y planificación a largo plazo",
-    "Acuario": "innovación tecnológica y proyectos orientados al futuro",
-    "Piscis": "actividades creativas o espirituales que sirvan a un propósito mayor"
-  };
-  
-  return growth[sign] || "actividades que resuenan con tu visión personal";
-};
-
-const getSaturnFinancialDisciplineBySign = (sign: string): string => {
-  const discipline: {[key: string]: string} = {
-    "Aries": "el control de impulsos y gastos impulsivos",
-    "Tauro": "el apego a posesiones materiales y la resistencia al cambio",
-    "Géminis": "la dispersión de energía en demasiados proyectos simultáneos",
-    "Cáncer": "los gastos emocionales y la tendencia a acumular por seguridad",
-    "Leo": "los gastos excesivos para impresionar a los demás",
-    "Virgo": "la excesiva preocupación por detalles que pueden paralizar la acción",
-    "Libra": "la indecisión y la búsqueda de perfección que retrasa oportunidades",
-    "Escorpio": "el control y la desconfianza en transacciones financieras",
-    "Sagitario": "los riesgos excesivos y la falta de planificación detallada",
-    "Capricornio": "el miedo a la escasez y la excesiva austeridad",
-    "Acuario": "la resistencia a métodos convencionales que podrían ser beneficiosos",
-    "Piscis": "la falta de límites claros y la evasión de realidades financieras"
-  };
-  
-  return discipline[sign] || "tus tendencias limitantes";
-};
-
-const getHouse8WealthSourceBySign = (sign: string): string => {
-  const sources: {[key: string]: string} = {
-    "Aries": "inversiones valientes en startups o proyectos pioneros",
-    "Tauro": "inversiones a largo plazo en bienes tangibles y recursos naturales",
-    "Géminis": "negocios relacionados con publicaciones, educación o comunicación",
-    "Cáncer": "bienes raíces o negocios vinculados a la familia",
-    "Leo": "inversiones creativas, entretenimiento o educación",
-    "Virgo": "trabajos de consultoría o servicios especializados",
-    "Libra": "asociaciones de negocios y contratos favorables",
-    "Escorpio": "inversiones profundas en áreas de investigación o transformación",
-    "Sagitario": "inversiones internacionales o educativas",
-    "Capricornio": "gestión de recursos compartidos con disciplina y estructura",
-    "Acuario": "proyectos grupales innovadores o tecnológicos",
-    "Piscis": "trabajos creativos o espirituales que involucran recursos compartidos"
-  };
-  
-  return sources[sign] || "inversiones que resuenan con tus intereses profundos";
-};
-
-const getHouse11NetworkBySign = (sign: string): string => {
-  const networks: {[key: string]: string} = {
-    "Aries": "líderes y emprendedores con energía pionera",
-    "Tauro": "personas con recursos y valores estables",
-    "Géminis": "comunicadores e intelectuales con ideas diversas",
-    "Cáncer": "grupos familiares o comunidades con fuerte sentido de pertenencia",
-    "Leo": "personas creativas, influyentes o en posiciones de liderazgo",
-    "Virgo": "profesionales especializados y orientados al servicio",
-    "Libra": "personas diplomáticas y con conexiones sociales estratégicas",
-    "Escorpio": "individuos con recursos compartidos o influencia transformadora",
-    "Sagitario": "contactos internacionales o en ámbitos educativos superiores",
-    "Capricornio": "personas con autoridad, experiencia o posiciones de poder",
-    "Acuario": "grupos innovadores orientados al futuro o causas humanitarias",
-    "Piscis": "comunidades creativas o espirituales con visión compasiva"
-  };
-  
-  return networks[sign] || "grupos que comparten tus ideales";
-};
-
-const getIncomeStrategiesBySign = (sign: string): string[] => {
-  const strategies: {[key: string]: string[]} = {
-    "Aries": [
-      "Inicia un emprendimiento que te permita liderar y tomar decisiones rápidas.",
-      "Busca roles donde puedas destacar por tu capacidad de acción e iniciativa.",
-      "Desarrolla habilidades en áreas que requieran valentía y capacidad de ser pionero."
-    ],
-    "Tauro": [
-      "Invierte en activos tangibles como bienes raíces que generen ingresos estables.",
-      "Desarrolla negocios relacionados con alimentos, arte o bienes de lujo.",
-      "Crea sistemas de ingresos pasivos que crezcan lentamente pero con solidez."
-    ],
-    "Géminis": [
-      "Diversifica tus fuentes de ingresos con múltiples proyectos simultáneos.",
-      "Desarrolla habilidades de comunicación que puedas monetizar (escritura, enseñanza, ventas).",
-      "Busca trabajos que te permitan variedad y aprendizaje constante."
-    ],
-    "Cáncer": [
-      "Considera negocios relacionados con el hogar, alimentación o cuidado.",
-      "Invierte en propiedades o negocios familiares con potencial de crecimiento.",
-      "Desarrolla productos o servicios que generen sensación de seguridad y bienestar."
-    ],
-    "Leo": [
-      "Monetiza tus talentos creativos y capacidad de liderazgo.",
-      "Desarrolla tu marca personal para destacar en tu industria.",
-      "Busca roles donde puedas brillar y ser reconocido por tu contribución única."
-    ],
-    "Virgo": [
-      "Ofrece servicios de análisis, organización o mejora de procesos.",
-      "Especialízate en áreas donde la precisión y atención al detalle sean valoradas.",
-      "Desarrolla sistemas eficientes que optimicen recursos y aumenten productividad."
-    ],
-    "Libra": [
-      "Establece asociaciones estratégicas que equilibren fortalezas y debilidades.",
-      "Trabaja en campos relacionados con la belleza, armonía o justicia.",
-      "Desarrolla habilidades de negociación y mediación que puedas monetizar."
-    ],
-    "Escorpio": [
-      "Investiga oportunidades de inversión con potencial de transformación profunda.",
-      "Considera trabajos en finanzas, investigación o psicología.",
-      "Busca formas de monetizar tu intuición y capacidad de ver más allá de lo evidente."
-    ],
-    "Sagitario": [
-      "Expande tu alcance a mercados internacionales o diversas culturas.",
-      "Desarrolla ofertas educativas o de conocimiento que puedas compartir ampliamente.",
-      "Busca oportunidades que combinen viajes, educación o expansión personal."
-    ],
-    "Capricornio": [
-      "Construye una carrera con objetivos claros de avance a largo plazo.",
-      "Invierte en tu educación y credenciales para aumentar tu valor en el mercado.",
-      "Desarrolla autoridad en tu campo para acceder a posiciones mejor remuneradas."
-    ],
-    "Acuario": [
-      "Explora tecnologías emergentes o métodos innovadores en tu campo.",
-      "Considera proyectos colaborativos o plataformas comunitarias.",
-      "Busca nichos no convencionales donde puedas destacar por tu originalidad."
-    ],
-    "Piscis": [
-      "Monetiza tus dones intuitivos, creativos o espirituales.",
-      "Desarrolla servicios que ayuden a otros a conectar con su interior.",
-      "Busca formas de combinar inspiración artística con practicidad comercial."
-    ]
-  };
-  
-  return strategies[sign] || [
-    "Identifica tus talentos naturales y busca formas de monetizarlos.",
-    "Desarrolla habilidades que sean valoradas en el mercado actual.",
-    "Crea múltiples fuentes de ingresos para mayor estabilidad financiera."
-  ];
-};
-
-const getJupiterIncomeStrategies = (jupiterSign: string): string[] => {
-  const strategies: {[key: string]: string[]} = {
-    "Aries": [
-      "Aprovecha oportunidades que requieran iniciativa y liderazgo.",
-      "Expande tu presencia en áreas donde puedas ser pionero."
-    ],
-    "Tauro": [
-      "Expande tus inversiones en activos tangibles y estables.",
-      "Desarrolla ofertas que proporcionen valor duradero y calidad."
-    ],
-    "Géminis": [
-      "Amplía tu red de contactos y canales de comunicación.",
-      "Diversifica tu oferta para llegar a diferentes audiencias."
-    ],
-    "Cáncer": [
-      "Expande negocios relacionados con bienestar emocional o familiar.",
-      "Cultiva relaciones a largo plazo con clientes que valoren la confianza."
-    ],
-    "Leo": [
-      "Aumenta tu visibilidad y reconocimiento en tu campo.",
-      "Desarrolla ofertas premium que reflejen calidad excepcional."
-    ],
-    "Virgo": [
-      "Expande servicios que solucionen problemas específicos.",
-      "Optimiza sistemas para aumentar eficiencia y rentabilidad."
-    ],
-    "Libra": [
-      "Establece alianzas estratégicas con socios complementarios.",
-      "Expande hacia mercados que valoren la estética y armonía."
-    ],
-    "Escorpio": [
-      "Profundiza en inversiones o áreas de especialización.",
-      "Transforma recursos existentes para crear mayor valor."
-    ],
-    "Sagitario": [
-      "Expande a mercados internacionales o culturalmente diversos.",
-      "Desarrolla ofertas educativas o filosóficas con amplio alcance."
-    ],
-    "Capricornio": [
-      "Construye autoridad y credibilidad en tu industria.",
-      "Establece metas financieras ambiciosas pero realistas."
-    ],
-    "Acuario": [
-      "Innova con tecnologías o enfoques progresistas.",
-      "Conecta con comunidades que compartan tus valores."
-    ],
-    "Piscis": [
-      "Expande en áreas creativas, espirituales o artísticas.",
-      "Confía en tu intuición para identificar oportunidades invisibles para otros."
-    ]
-  };
-  
-  return strategies[jupiterSign] || [
-    "Identifica áreas donde puedas expandirte naturalmente sin forzar.",
-    "Mantén una actitud optimista pero realista hacia las oportunidades."
-  ];
-};
-
-const getCareerRecommendationsBySign = (sign: string): string[] => {
-  const careers: {[key: string]: string[]} = {
-    "Aries": [
-      "Emprendimiento o startups en sectores emergentes.",
-      "Deportes, fitness o industrias competitivas.",
-      "Posiciones de liderazgo en empresas dinámicas.",
-      "Consultoría estratégica o coaching ejecutivo.",
-      "Carreras militares, de seguridad o primeros auxilios."
-    ],
-    "Tauro": [
-      "Finanzas, banca o gestión de inversiones.",
-      "Agricultura, alimentación o gastronomía.",
-      "Arte, diseño o industrias de lujo.",
-      "Bienes raíces o gestión de propiedades.",
-      "Arquitectura o construcción sostenible."
-    ],
-    "Géminis": [
-      "Periodismo, comunicación o relaciones públicas.",
-      "Ventas, marketing digital o comercio.",
-      "Educación, enseñanza o formación.",
-      "Tecnología de la información o creación de contenidos.",
-      "Transporte, logística o coordinación de proyectos."
-    ],
-    "Cáncer": [
-      "Cuidado de la salud, enfermería o terapia.",
-      "Hospitalidad, alimentación o nutrición.",
-      "Bienes raíces residenciales o diseño de interiores.",
-      "Servicio social, cuidado infantil o geriátrico.",
-      "Negocios familiares o patrimonio cultural."
-    ],
-    "Leo": [
-      "Entretenimiento, artes escénicas o dirección creativa.",
-      "Gestión ejecutiva o liderazgo organizacional.",
-      "Educación, formación o motivación.",
-      "Política, diplomacia o relaciones públicas.",
-      "Industrias de lujo, moda o belleza."
-    ],
-    "Virgo": [
-      "Salud, medicina o bienestar.",
-      "Análisis de datos, estadística o investigación.",
-      "Edición, corrección o documentación técnica.",
-      "Gestión de proyectos, organización o logística.",
-      "Tecnología, programación o control de calidad."
-    ],
-    "Libra": [
-      "Derecho, mediación o justicia.",
-      "Diplomacia, relaciones internacionales o política.",
-      "Diseño, decoración o artes visuales.",
-      "Planificación de eventos, bodas o negociaciones.",
-      "Servicios de consultoría en equilibrio trabajo-vida."
-    ],
-    "Escorpio": [
-      "Investigación, desarrollo o ciencias.",
-      "Psicología, terapia o consejería.",
-      "Finanzas, inversiones o gestión de crisis.",
-      "Medicina, cirugía o forense.",
-      "Transformación empresarial o consultoría estratégica."
-    ],
-    "Sagitario": [
-      "Educación superior, filosofía o religión.",
-      "Turismo, viajes o relaciones internacionales.",
-      "Publicaciones, editorial o comunicación.",
-      "Derecho, ética o sistemas de creencias.",
-      "Deportes, aventura o exploración."
-    ],
-    "Capricornio": [
-      "Administración empresarial o gestión corporativa.",
-      "Finanzas, contabilidad o planificación estratégica.",
-      "Política, gobierno o administración pública.",
-      "Ingeniería, arquitectura o construcción.",
-      "Consultoría de negocios, estrategia o reestructuración."
-    ],
-    "Acuario": [
-      "Tecnología, innovación o startups.",
-      "Ciencias, investigación o desarrollos futuristas.",
-      "Activismo social, ONGs o política progresista.",
-      "Psicología social, antropología o estudios culturales.",
-      "Redes sociales, comunidades online o desarrollo web."
-    ],
-    "Piscis": [
-      "Artes visuales, música o escritura creativa.",
-      "Espiritualidad, coaching o sanación holística.",
-      "Trabajo social, terapia o consejería.",
-      "Fotografía, cine o industrias creativas.",
-      "Oceanografía, biología marina o trabajo con agua."
-    ]
-  };
-  
-  return careers[sign] || [
-    "Carreras que permitan expresar tu creatividad y talentos únicos.",
-    "Roles que combinen tus habilidades técnicas con tus intereses personales.",
-    "Posiciones que ofrezcan crecimiento personal y profesional.",
-    "Trabajos que contribuyan positivamente a la sociedad o el medio ambiente.",
-    "Emprendimientos basados en tus pasiones y valores fundamentales."
-  ];
-};
-
