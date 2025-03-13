@@ -1,19 +1,25 @@
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Star, Moon, Mail, Lock, UserPlus, LogIn, AlertTriangle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import BackgroundImage from '../components/BackgroundImage';
 import StarryBackground from '../components/StarryBackground';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
 
 const Auth = () => {
+  const [searchParams] = useSearchParams();
+  const initialMode = searchParams.get('mode') === 'register' ? false : true;
+  
   const [loaded, setLoaded] = useState(false);
-  const [isLoginMode, setIsLoginMode] = useState(true);
+  const [isLoginMode, setIsLoginMode] = useState(initialMode);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
@@ -34,8 +40,8 @@ const Auth = () => {
     
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session) {
-        navigate('/home');
+      if (event === 'SIGNED_IN' && session) {
+        navigate('/onboarding');
       }
     });
 
@@ -58,10 +64,19 @@ const Auth = () => {
         });
 
         if (error) throw error;
+        
+        if (rememberMe) {
+          localStorage.setItem('rememberedEmail', email);
+        } else {
+          localStorage.removeItem('rememberedEmail');
+        }
+        
         toast({
           title: "Inicio de sesión exitoso",
           description: "Bienvenido/a de vuelta",
         });
+        
+        navigate('/home');
       } else {
         // Sign up
         const { error } = await supabase.auth.signUp({
@@ -70,10 +85,14 @@ const Auth = () => {
         });
 
         if (error) throw error;
+        
         toast({
           title: "Registro exitoso",
-          description: "Se ha creado tu cuenta",
+          description: "Por favor, verifica tu correo electrónico para continuar",
         });
+        
+        // Redirect to a verification page or show a message
+        navigate('/auth/verify', { state: { email } });
       }
     } catch (error: any) {
       console.error('Authentication error:', error);
@@ -97,6 +116,15 @@ const Auth = () => {
     setIsLoginMode(!isLoginMode);
     setErrorMessage('');
   };
+  
+  // Check if we have a remembered email
+  useEffect(() => {
+    const rememberedEmail = localStorage.getItem('rememberedEmail');
+    if (rememberedEmail) {
+      setEmail(rememberedEmail);
+      setRememberMe(true);
+    }
+  }, []);
 
   return (
     <div className="relative min-h-screen w-full overflow-hidden">
@@ -160,6 +188,20 @@ const Auth = () => {
                     />
                   </div>
                 </div>
+                
+                {isLoginMode && (
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id="rememberMe" 
+                      checked={rememberMe} 
+                      onCheckedChange={(checked) => setRememberMe(checked === true)}
+                      className="border-cosmos-gold/50 data-[state=checked]:bg-cosmos-gold/70"
+                    />
+                    <Label htmlFor="rememberMe" className="text-sm text-cosmos-darkGold">
+                      Recordar mis datos
+                    </Label>
+                  </div>
+                )}
                 
                 <Button
                   type="submit"

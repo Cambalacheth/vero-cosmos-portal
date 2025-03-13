@@ -57,13 +57,24 @@ const Index = () => {
               </div>
             </div>
             
-            <div className={`mb-6 transition-all duration-1000 delay-700 ${loaded ? 'opacity-100' : 'opacity-0'}`}>
-              <Link to="/auth">
+            <div className={`mb-3 transition-all duration-1000 delay-700 ${loaded ? 'opacity-100' : 'opacity-0'}`}>
+              <Link to="/auth?mode=login">
                 <button 
-                  className="button-effect group relative px-8 py-3 glass-card border-cosmos-pink border overflow-hidden rounded-full"
+                  className="button-effect group relative px-8 py-3 glass-card border-cosmos-pink border overflow-hidden rounded-full w-full mb-3"
                 >
                   <span className="relative z-10 font-medium text-cosmos-darkGold group-hover:text-white transition-colors duration-300">
-                    Conoce tu Destino
+                    Ingresar
+                  </span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-cosmos-gold to-cosmos-darkGold opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-full"></div>
+                </button>
+              </Link>
+              
+              <Link to="/auth?mode=register">
+                <button 
+                  className="button-effect group relative px-8 py-3 glass-card border-cosmos-gold border overflow-hidden rounded-full w-full"
+                >
+                  <span className="relative z-10 font-medium text-cosmos-darkGold group-hover:text-white transition-colors duration-300">
+                    Regístrate aquí
                   </span>
                   <div className="absolute inset-0 bg-gradient-to-r from-cosmos-gold to-cosmos-darkGold opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-full"></div>
                 </button>
