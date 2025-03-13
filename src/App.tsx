@@ -18,6 +18,9 @@ import AuthVerify from "./pages/AuthVerify";
 import Onboarding from "./pages/Onboarding";
 import WealthMap from "./pages/WealthMap";
 import Community from "./pages/Community";
+import Maps from "./pages/Maps";
+import CareerMap from "./pages/CareerMap";
+import LoveMap from "./pages/LoveMap";
 
 const queryClient = new QueryClient();
 
@@ -41,7 +44,10 @@ const App = () => (
                 <Route path="/aprender" element={<Home />} />
                 <Route path="/perfil" element={<Profile />} />
                 <Route path="/premium" element={<Premium />} />
+                <Route path="/mapas" element={<Maps />} />
                 <Route path="/riqueza" element={<WealthMap />} />
+                <Route path="/carrera" element={<CareerMap />} />
+                <Route path="/amor" element={<LoveMap />} />
                 <Route path="/comunidad" element={<Community />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />

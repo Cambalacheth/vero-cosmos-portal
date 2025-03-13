@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Sparkles, Calendar, User, Home, Compass, DollarSign } from 'lucide-react';
+import { Sparkles, Calendar, User, Home, Map, DollarSign, Users } from 'lucide-react';
 
 const NavBar = () => {
   const navigate = useNavigate();
@@ -35,20 +35,22 @@ const NavBar = () => {
           
           <button 
             className={`flex flex-col items-center space-y-1 px-4 py-1 rounded-lg transition-all
-                      ${isActive('/calendario') ? 'text-cosmos-darkGold' : 'text-gray-500'}`}
-            onClick={() => navigate('/calendario')}
+                      ${location.pathname.includes('/mapa') || location.pathname === '/mapas' || 
+                        location.pathname === '/riqueza' || location.pathname === '/carrera' || 
+                        location.pathname === '/amor' ? 'text-cosmos-darkGold' : 'text-gray-500'}`}
+            onClick={() => navigate('/mapas')}
           >
-            <Calendar className="w-5 h-5 sm:w-6 sm:h-6" />
-            <span className="text-xs">Calendario</span>
+            <Map className="w-5 h-5 sm:w-6 sm:h-6" />
+            <span className="text-xs">Mapas</span>
           </button>
           
           <button 
             className={`flex flex-col items-center space-y-1 px-4 py-1 rounded-lg transition-all
-                      ${isActive('/riqueza') ? 'text-cosmos-darkGold' : 'text-gray-500'}`}
-            onClick={() => navigate('/riqueza')}
+                      ${isActive('/comunidad') ? 'text-cosmos-darkGold' : 'text-gray-500'}`}
+            onClick={() => navigate('/comunidad')}
           >
-            <DollarSign className="w-5 h-5 sm:w-6 sm:h-6" />
-            <span className="text-xs">Riqueza</span>
+            <Users className="w-5 h-5 sm:w-6 sm:h-6" />
+            <span className="text-xs">Comunidad</span>
           </button>
           
           <button 
