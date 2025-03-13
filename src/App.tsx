@@ -5,7 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/contexts/ThemeContext";
-import { AuthProvider } from "@/contexts/AuthContext"; // Changed from AuthProvider to AuthContext
+import { AuthProvider } from "@/contexts/AuthContext"; 
 import Index from "./pages/Index";
 import Home from "./pages/Home";
 import Calendar from "./pages/Calendar";
@@ -25,25 +25,27 @@ const App = () => (
     <ThemeProvider>
       <AuthProvider>
         <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/auth" element={<Auth />} />
-              <Route path="/auth/verify" element={<AuthVerify />} />
-              <Route path="/onboarding" element={<Onboarding />} />
-              <Route path="/home" element={<Home />} />
-              <Route path="/calendario" element={<Calendar />} />
-              <Route path="/tarot" element={<Tarot />} />
-              <Route path="/aprender" element={<Home />} />
-              <Route path="/perfil" element={<Profile />} />
-              <Route path="/premium" element={<Premium />} />
-              <Route path="/riqueza" element={<WealthMap />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
+          <div className="max-h-screen overflow-auto">
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/auth" element={<Auth />} />
+                <Route path="/auth/verify" element={<AuthVerify />} />
+                <Route path="/onboarding" element={<Onboarding />} />
+                <Route path="/home" element={<Home />} />
+                <Route path="/calendario" element={<Calendar />} />
+                <Route path="/tarot" element={<Tarot />} />
+                <Route path="/aprender" element={<Home />} />
+                <Route path="/perfil" element={<Profile />} />
+                <Route path="/premium" element={<Premium />} />
+                <Route path="/riqueza" element={<WealthMap />} />
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </div>
         </TooltipProvider>
       </AuthProvider>
     </ThemeProvider>

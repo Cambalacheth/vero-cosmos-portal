@@ -20,7 +20,7 @@ const NavBar = () => {
                       ${isActive('/home') ? 'text-cosmos-darkGold' : 'text-gray-500'}`}
             onClick={() => navigate('/home')}
           >
-            <Home className="w-6 h-6" />
+            <Home className="w-5 h-5 sm:w-6 sm:h-6" />
             <span className="text-xs">Inicio</span>
           </button>
           
@@ -29,7 +29,7 @@ const NavBar = () => {
                       ${isActive('/tarot') ? 'text-cosmos-darkGold' : 'text-gray-500'}`}
             onClick={() => navigate('/tarot')}
           >
-            <Sparkles className="w-6 h-6" />
+            <Sparkles className="w-5 h-5 sm:w-6 sm:h-6" />
             <span className="text-xs">Tarot</span>
           </button>
           
@@ -38,7 +38,7 @@ const NavBar = () => {
                       ${isActive('/calendario') ? 'text-cosmos-darkGold' : 'text-gray-500'}`}
             onClick={() => navigate('/calendario')}
           >
-            <Calendar className="w-6 h-6" />
+            <Calendar className="w-5 h-5 sm:w-6 sm:h-6" />
             <span className="text-xs">Calendario</span>
           </button>
           
@@ -47,7 +47,7 @@ const NavBar = () => {
                       ${isActive('/riqueza') ? 'text-cosmos-darkGold' : 'text-gray-500'}`}
             onClick={() => navigate('/riqueza')}
           >
-            <DollarSign className="w-6 h-6" />
+            <DollarSign className="w-5 h-5 sm:w-6 sm:h-6" />
             <span className="text-xs">Riqueza</span>
           </button>
           
@@ -56,7 +56,7 @@ const NavBar = () => {
                       ${isActive('/perfil') ? 'text-cosmos-darkGold' : 'text-gray-500'}`}
             onClick={() => navigate('/perfil')}
           >
-            <User className="w-6 h-6" />
+            <User className="w-5 h-5 sm:w-6 sm:h-6" />
             <span className="text-xs">Perfil</span>
           </button>
         </div>
