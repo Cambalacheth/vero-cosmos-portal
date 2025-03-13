@@ -21,6 +21,14 @@ export interface PlanetaryPosition {
   sign: string;
   degree: number;
   icon: string;
+  house?: number; // Nueva propiedad para la casa astrológica
+}
+
+// Interfaz para representar una casa astrológica
+export interface HousePosition {
+  house: number;
+  sign: string;
+  degree: number;
 }
 
 // Interfaz para los datos de la carta natal
@@ -31,6 +39,13 @@ export interface NatalChartData {
   mercury: PlanetaryPosition;
   venus: PlanetaryPosition;
   mars: PlanetaryPosition;
-  jupiter?: PlanetaryPosition;
-  saturn?: PlanetaryPosition;
+  jupiter: PlanetaryPosition;
+  saturn: PlanetaryPosition;
+  uranus: PlanetaryPosition;
+  neptune: PlanetaryPosition;
+  pluto: PlanetaryPosition;
+  houses: HousePosition[];
+  birthDate?: Date;
+  birthTime?: string;
+  birthplace?: Location;
 }

@@ -40,6 +40,9 @@ export const planetIcons: Record<string, string> = {
   "Marte": "♂",
   "Júpiter": "♃",
   "Saturno": "♄",
+  "Urano": "♅",
+  "Neptuno": "♆",
+  "Plutón": "♇",
   "Ascendente": "⬆️"
 };
 

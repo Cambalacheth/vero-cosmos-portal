@@ -1,4 +1,3 @@
-
 // Constantes astronómicas
 const J2000_0 = 2451545.0; // Época J2000.0 en días julianos
 const DEGREES_TO_RADIANS = Math.PI / 180;
@@ -225,6 +224,134 @@ export const calculateMarsPosition = (date: Date): { sign: string, degree: numbe
   const degree = L % 30;
   
   return { sign: signs[signIndex], degree: Math.floor(degree) };
+};
+
+// Función para calcular la posición de Júpiter (simplificada)
+export const calculateJupiterPosition = (date: Date): { sign: string, degree: number } => {
+  const jd = calculateJulianDay(date);
+  const T = calculateJulianCentury(jd);
+  
+  // Parámetros orbitales simplificados de Júpiter
+  let L = 238.049257 + 3036.3013576 * T;
+  L = L % 360;
+  if (L < 0) L += 360;
+  
+  // Determinar el signo zodiacal y los grados
+  const signs = ["Aries", "Tauro", "Géminis", "Cáncer", "Leo", "Virgo", "Libra", "Escorpio", "Sagitario", "Capricornio", "Acuario", "Piscis"];
+  const signIndex = Math.floor(L / 30);
+  const degree = L % 30;
+  
+  return { sign: signs[signIndex], degree: Math.floor(degree) };
+};
+
+// Función para calcular la posición de Saturno (simplificada)
+export const calculateSaturnPosition = (date: Date): { sign: string, degree: number } => {
+  const jd = calculateJulianDay(date);
+  const T = calculateJulianCentury(jd);
+  
+  // Parámetros orbitales simplificados de Saturno
+  let L = 266.564377 + 1223.5110686 * T;
+  L = L % 360;
+  if (L < 0) L += 360;
+  
+  // Determinar el signo zodiacal y los grados
+  const signs = ["Aries", "Tauro", "Géminis", "Cáncer", "Leo", "Virgo", "Libra", "Escorpio", "Sagitario", "Capricornio", "Acuario", "Piscis"];
+  const signIndex = Math.floor(L / 30);
+  const degree = L % 30;
+  
+  return { sign: signs[signIndex], degree: Math.floor(degree) };
+};
+
+// Función para calcular la posición de Urano (simplificada)
+export const calculateUranusPosition = (date: Date): { sign: string, degree: number } => {
+  const jd = calculateJulianDay(date);
+  const T = calculateJulianCentury(jd);
+  
+  // Parámetros orbitales simplificados de Urano
+  let L = 244.197470 + 429.8632858 * T;
+  L = L % 360;
+  if (L < 0) L += 360;
+  
+  // Determinar el signo zodiacal y los grados
+  const signs = ["Aries", "Tauro", "Géminis", "Cáncer", "Leo", "Virgo", "Libra", "Escorpio", "Sagitario", "Capricornio", "Acuario", "Piscis"];
+  const signIndex = Math.floor(L / 30);
+  const degree = L % 30;
+  
+  return { sign: signs[signIndex], degree: Math.floor(degree) };
+};
+
+// Función para calcular la posición de Neptuno (simplificada)
+export const calculateNeptunePosition = (date: Date): { sign: string, degree: number } => {
+  const jd = calculateJulianDay(date);
+  const T = calculateJulianCentury(jd);
+  
+  // Parámetros orbitales simplificados de Neptuno
+  let L = 84.457994 + 219.8853366 * T;
+  L = L % 360;
+  if (L < 0) L += 360;
+  
+  // Determinar el signo zodiacal y los grados
+  const signs = ["Aries", "Tauro", "Géminis", "Cáncer", "Leo", "Virgo", "Libra", "Escorpio", "Sagitario", "Capricornio", "Acuario", "Piscis"];
+  const signIndex = Math.floor(L / 30);
+  const degree = L % 30;
+  
+  return { sign: signs[signIndex], degree: Math.floor(degree) };
+};
+
+// Función para calcular la posición de Plutón (simplificada)
+export const calculatePlutoPosition = (date: Date): { sign: string, degree: number } => {
+  const jd = calculateJulianDay(date);
+  const T = calculateJulianCentury(jd);
+  
+  // Parámetros orbitales simplificados de Plutón
+  let L = 224.067472 + 144.9600255 * T;
+  L = L % 360;
+  if (L < 0) L += 360;
+  
+  // Determinar el signo zodiacal y los grados
+  const signs = ["Aries", "Tauro", "Géminis", "Cáncer", "Leo", "Virgo", "Libra", "Escorpio", "Sagitario", "Capricornio", "Acuario", "Piscis"];
+  const signIndex = Math.floor(L / 30);
+  const degree = L % 30;
+  
+  return { sign: signs[signIndex], degree: Math.floor(degree) };
+};
+
+// Función para calcular las cusps de las casas usando el sistema Placidus
+export const calculateHouseCusps = (siderealTime: number, latitude: number): { house: number, sign: string, degree: number }[] => {
+  const houses: { house: number, sign: string, degree: number }[] = [];
+  const signs = ["Aries", "Tauro", "Géminis", "Cáncer", "Leo", "Virgo", "Libra", "Escorpio", "Sagitario", "Capricornio", "Acuario", "Piscis"];
+  
+  // Convertir a radianes
+  const latRad = latitude * DEGREES_TO_RADIANS;
+  const RAMC = siderealTime * 15 * DEGREES_TO_RADIANS;
+  const epsilon = 23.4392911 * DEGREES_TO_RADIANS; // Oblicuidad de la eclíptica
+  
+  // House 1 (Ascendente)
+  const ascRad = Math.atan2(
+    Math.cos(RAMC),
+    Math.sin(RAMC) * Math.cos(epsilon) + Math.tan(latRad) * Math.sin(epsilon)
+  );
+  let ascDeg = ascRad * RADIANS_TO_DEGREES;
+  if (ascDeg < 0) ascDeg += 360;
+  
+  houses.push({
+    house: 1,
+    sign: signs[Math.floor(ascDeg / 30)],
+    degree: Math.floor(ascDeg % 30)
+  });
+  
+  // Simplificación: generar las demás casas a intervalos de 30 grados
+  // (En un sistema real, se aplicarían fórmulas más complejas para Placidus)
+  for (let i = 1; i < 12; i++) {
+    let cusplDeg = (ascDeg + i * 30) % 360;
+    houses.push({
+      house: i + 1,
+      sign: signs[Math.floor(cusplDeg / 30)],
+      degree: Math.floor(cusplDeg % 30)
+    });
+  }
+  
+  return houses;
 };
 
 // Función para calcular posición planetaria (compatibilidad con código existente)
