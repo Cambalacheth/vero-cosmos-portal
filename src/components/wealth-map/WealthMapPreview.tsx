@@ -3,7 +3,7 @@ import React from 'react';
 import { NatalChartData } from '@/lib/natal-chart';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Lock, MessageSquare, Calendar, CheckSquare } from 'lucide-react';
+import { Lock, MessageSquare, Calendar, CheckSquare, TrendingUp, GaugeCircle } from 'lucide-react';
 import { getWealthMapBasicAnalysis } from '@/lib/wealth-map-service';
 
 interface WealthMapPreviewProps {
@@ -53,7 +53,9 @@ const WealthMapPreview: React.FC<WealthMapPreviewProps> = ({ natalChart, onUpgra
             </div>
           </div>
           
-          <div className="space-y-3 mb-4">
+          <div className="space-y-3 mb-4 mt-6">
+            <h4 className="font-medium text-xs text-cosmos-gold mb-2">Funciones Premium Bloqueadas:</h4>
+            
             <div className="flex items-center space-x-2 text-xs text-gray-500">
               <Lock className="w-3 h-3 text-cosmos-darkGold" />
               <div className="flex items-center">
@@ -73,8 +75,16 @@ const WealthMapPreview: React.FC<WealthMapPreviewProps> = ({ natalChart, onUpgra
             <div className="flex items-center space-x-2 text-xs text-gray-500">
               <Lock className="w-3 h-3 text-cosmos-darkGold" />
               <div className="flex items-center">
-                <CheckSquare className="w-3 h-3 mr-1 text-cosmos-darkGold" />
+                <TrendingUp className="w-3 h-3 mr-1 text-cosmos-darkGold" />
                 <span>Plan de Acción Personalizado</span>
+              </div>
+            </div>
+            
+            <div className="flex items-center space-x-2 text-xs text-gray-500">
+              <Lock className="w-3 h-3 text-cosmos-darkGold" />
+              <div className="flex items-center">
+                <GaugeCircle className="w-3 h-3 mr-1 text-cosmos-darkGold" />
+                <span>Análisis Detallado de Aspectos Planetarios</span>
               </div>
             </div>
           </div>

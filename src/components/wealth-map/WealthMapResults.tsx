@@ -1,5 +1,5 @@
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { NatalChartData } from '@/lib/natal-chart';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -19,6 +19,11 @@ type ChatMessage = {
   timestamp: Date;
 };
 
+type ActionStatus = {
+  id: number;
+  completed: boolean;
+};
+
 const WealthMapResults: React.FC<WealthMapResultsProps> = ({ natalChart }) => {
   const [activeTab, setActiveTab] = useState("overview");
   const fullAnalysis = getWealthMapFullAnalysis(natalChart);
@@ -27,6 +32,9 @@ const WealthMapResults: React.FC<WealthMapResultsProps> = ({ natalChart }) => {
   ]);
   const [inputMessage, setInputMessage] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [actionStatuses, setActionStatuses] = useState<ActionStatus[]>(
+    fullAnalysis.actionPlan.map((_, index) => ({ id: index, completed: false }))
+  );
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   
@@ -34,6 +42,11 @@ const WealthMapResults: React.FC<WealthMapResultsProps> = ({ natalChart }) => {
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
+  
+  // Effect to scroll when messages change
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
   
   // Handle sending a chat message
   const handleSendMessage = () => {
@@ -63,9 +76,6 @@ const WealthMapResults: React.FC<WealthMapResultsProps> = ({ natalChart }) => {
       
       setMessages(prev => [...prev, aiMessage]);
       setIsProcessing(false);
-      
-      // Scroll to bottom after message is added
-      setTimeout(scrollToBottom, 100);
     }, 1500);
   };
   
@@ -79,10 +89,34 @@ const WealthMapResults: React.FC<WealthMapResultsProps> = ({ natalChart }) => {
   
   // Mark an action as completed
   const markActionComplete = (index: number) => {
+    setActionStatuses(prev => 
+      prev.map(status => 
+        status.id === index ? { ...status, completed: !status.completed } : status
+      )
+    );
+    
     toast({
-      title: "Acción completada",
-      description: "Has marcado esta acción como completada. ¡Buen trabajo!",
+      title: actionStatuses.find(s => s.id === index)?.completed 
+        ? "Acción pendiente" 
+        : "Acción completada",
+      description: actionStatuses.find(s => s.id === index)?.completed 
+        ? "Has marcado esta acción como pendiente." 
+        : "Has marcado esta acción como completada. ¡Buen trabajo!",
     });
+  };
+  
+  // Format date for displaying in the calendar
+  const formatCalendarDate = (dateString: string) => {
+    const options: Intl.DateTimeFormatOptions = { 
+      day: 'numeric', 
+      month: 'long'
+    };
+    
+    try {
+      return new Date(dateString).toLocaleDateString('es-ES', options);
+    } catch (e) {
+      return dateString;
+    }
   };
   
   return (
@@ -149,19 +183,36 @@ const WealthMapResults: React.FC<WealthMapResultsProps> = ({ natalChart }) => {
               <ScrollArea className="max-h-[400px] pr-2">
                 <div className="space-y-3">
                   {fullAnalysis.actionPlan.map((action, index) => (
-                    <div key={index} className="bg-cosmos-pink/10 p-3 rounded-lg">
+                    <div 
+                      key={index} 
+                      className={`bg-cosmos-pink/10 p-3 rounded-lg transition-all ${
+                        actionStatuses[index]?.completed ? 'bg-green-50 border border-green-200' : ''
+                      }`}
+                    >
                       <div className="flex justify-between items-start">
                         <div className="flex-1">
-                          <h4 className="text-sm font-medium mb-1 text-cosmos-darkGold">{action.title}</h4>
-                          <p className="text-xs">{action.description}</p>
+                          <h4 className={`text-sm font-medium mb-1 ${
+                            actionStatuses[index]?.completed ? 'text-green-700 line-through' : 'text-cosmos-darkGold'
+                          }`}>
+                            {action.title}
+                          </h4>
+                          <p className={`text-xs ${
+                            actionStatuses[index]?.completed ? 'text-green-600' : ''
+                          }`}>
+                            {action.description}
+                          </p>
                           {action.timing && (
                             <p className="text-xs mt-2 text-cosmos-darkGold">Mejor momento: {action.timing}</p>
                           )}
                         </div>
                         <Button 
-                          variant="ghost" 
+                          variant={actionStatuses[index]?.completed ? "default" : "ghost"}
                           size="icon" 
-                          className="h-8 w-8 rounded-full text-cosmos-darkGold hover:text-cosmos-gold"
+                          className={`h-8 w-8 rounded-full ${
+                            actionStatuses[index]?.completed 
+                              ? 'bg-green-500 text-white hover:bg-green-600' 
+                              : 'text-cosmos-darkGold hover:text-cosmos-gold'
+                          }`}
                           onClick={() => markActionComplete(index)}
                         >
                           <CheckCircle2 className="h-5 w-5" />
@@ -184,7 +235,9 @@ const WealthMapResults: React.FC<WealthMapResultsProps> = ({ natalChart }) => {
                   {fullAnalysis.financialCalendar.map((entry, index) => (
                     <div key={index} className="bg-cosmos-pink/10 p-3 rounded-lg">
                       <div className="flex justify-between items-center mb-1">
-                        <h4 className="text-sm font-medium text-cosmos-darkGold">{entry.date}</h4>
+                        <h4 className="text-sm font-medium text-cosmos-darkGold">
+                          {formatCalendarDate(entry.date)}
+                        </h4>
                         <span className="text-xs bg-yellow-500/20 px-2 py-0.5 rounded-full text-yellow-700">
                           {entry.transitType}
                         </span>
@@ -204,8 +257,8 @@ const WealthMapResults: React.FC<WealthMapResultsProps> = ({ natalChart }) => {
                 Haz preguntas específicas sobre tu situación financiera y recibe consejos basados en tu carta natal
               </p>
               
-              <div className="border border-cosmos-pink/30 rounded-lg p-3 mb-3 h-[280px] overflow-hidden">
-                <ScrollArea className="h-full pr-2">
+              <div className="border border-cosmos-pink/30 rounded-lg p-3 mb-3 h-[280px] overflow-hidden flex flex-col">
+                <ScrollArea className="flex-1 pr-2 mb-2">
                   <div className="space-y-3">
                     {messages.map((msg, index) => (
                       <div 
@@ -226,23 +279,49 @@ const WealthMapResults: React.FC<WealthMapResultsProps> = ({ natalChart }) => {
                     <div ref={messagesEndRef} />
                   </div>
                 </ScrollArea>
+                
+                <div className="flex gap-2 items-center mt-auto">
+                  <textarea 
+                    value={inputMessage}
+                    onChange={(e) => setInputMessage(e.target.value)}
+                    onKeyDown={handleKeyPress}
+                    placeholder="Haz una pregunta sobre tu carta natal y abundancia..." 
+                    className="flex-1 px-3 py-2 text-sm bg-white bg-opacity-30 border border-cosmos-pink rounded-lg h-[60px] resize-none"
+                  />
+                  <Button
+                    onClick={handleSendMessage}
+                    disabled={isProcessing || !inputMessage.trim()}
+                    className="px-3 py-2 h-[60px] w-[60px] bg-cosmos-pink/20 rounded-lg text-cosmos-darkGold border border-cosmos-pink flex items-center justify-center"
+                  >
+                    {isProcessing ? (
+                      <div className="h-5 w-5 rounded-full border-2 border-cosmos-darkGold border-t-transparent animate-spin" />
+                    ) : (
+                      <Send className="w-5 h-5" />
+                    )}
+                  </Button>
+                </div>
               </div>
               
-              <div className="flex gap-2 items-center">
-                <textarea 
-                  value={inputMessage}
-                  onChange={(e) => setInputMessage(e.target.value)}
-                  onKeyDown={handleKeyPress}
-                  placeholder="Haz una pregunta sobre tu carta natal y abundancia..." 
-                  className="flex-1 px-3 py-2 text-sm bg-white bg-opacity-30 border border-cosmos-pink rounded-lg h-[60px] resize-none"
-                />
-                <Button
-                  onClick={handleSendMessage}
-                  disabled={isProcessing || !inputMessage.trim()}
-                  className="px-3 py-2 h-[60px] w-[60px] bg-cosmos-pink/20 rounded-lg text-cosmos-darkGold border border-cosmos-pink flex items-center justify-center"
-                >
-                  <Send className="w-5 h-5" />
-                </Button>
+              <div className="bg-cosmos-gold/10 p-3 rounded-lg">
+                <h4 className="text-xs font-medium text-cosmos-darkGold mb-1">Sugerencias de preguntas:</h4>
+                <div className="grid grid-cols-2 gap-2 mt-2">
+                  {[
+                    "¿Cómo puedo mejorar mi relación con el dinero?",
+                    "¿Qué carrera es ideal según mi carta natal?",
+                    "¿Cómo influye Júpiter en mis finanzas?",
+                    "¿Cuáles son mis mejores fechas para inversiones?"
+                  ].map((question, i) => (
+                    <Button 
+                      key={i}
+                      variant="ghost" 
+                      size="sm"
+                      className="text-xs justify-start h-auto py-1 px-2 bg-white/20 hover:bg-white/30 text-cosmos-darkGold"
+                      onClick={() => setInputMessage(question)}
+                    >
+                      {question}
+                    </Button>
+                  ))}
+                </div>
               </div>
             </div>
           </TabsContent>
@@ -269,14 +348,18 @@ const generateAIResponse = (message: string, chart: NatalChartData, analysis: an
     return `Tu Casa 8 en ${chart.houses[7].sign} indica que ${analysis.houses8And11Analysis.split('.')[0]}.`;
   } else if (lowerMessage.includes('redes') || lowerMessage.includes('amigos') || lowerMessage.includes('casa 11')) {
     return `Tu Casa 11 en ${chart.houses[10].sign} sugiere que ${analysis.houses8And11Analysis.split('.')[1] || 'las redes y conexiones sociales pueden ser importantes para tu riqueza.'}`;
+  } else if (lowerMessage.includes('fecha') || lowerMessage.includes('cuando') || lowerMessage.includes('momento')) {
+    // Return information about upcoming dates from the financial calendar
+    const nextDate = analysis.financialCalendar[0];
+    return `Según tu calendario astrológico financiero, el próximo evento importante es el ${nextDate.date}: un ${nextDate.transitType} que sugiere: ${nextDate.recommendation}`;
+  } else if (lowerMessage.includes('acción') || lowerMessage.includes('hacer') || lowerMessage.includes('pasos')) {
+    // Return a suggestion from the action plan
+    const randomAction = analysis.actionPlan[Math.floor(Math.random() * analysis.actionPlan.length)];
+    return `Te recomendaría esta acción de tu plan personalizado: ${randomAction.title} - ${randomAction.description}`;
   } else if (lowerMessage.includes('consejo') || lowerMessage.includes('recomendación') || lowerMessage.includes('qué debo hacer')) {
     // Return a random action from the action plan
     const randomAction = analysis.actionPlan[Math.floor(Math.random() * analysis.actionPlan.length)];
     return `Te recomendaría: ${randomAction.title} - ${randomAction.description}`;
-  } else if (lowerMessage.includes('cuando') || lowerMessage.includes('fecha') || lowerMessage.includes('momento')) {
-    // Return a relevant date from the calendar
-    const nextDate = analysis.financialCalendar[0];
-    return `Según tu calendario astrológico financiero, el ${nextDate.date} hay un ${nextDate.transitType} que te recomienda: ${nextDate.recommendation}`;
   } else {
     return 'Basándome en tu carta natal, puedo ver que tienes potencial para la prosperidad financiera. ¿Te gustaría saber más sobre algún aspecto específico como tu Casa 2 (dinero), Casa 10 (carrera), o la influencia de Júpiter y Saturno en tus finanzas?';
   }
