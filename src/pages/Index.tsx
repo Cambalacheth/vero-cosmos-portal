@@ -29,11 +29,11 @@ const Index = () => {
           >
             <CelestialHeader />
             
-            <h1 className="text-4xl md:text-5xl font-playfair mt-8 font-bold tracking-tight clip-text">
+            <h1 className="text-4xl md:text-5xl font-playfair mt-8 font-bold tracking-tight clip-text bg-gradient-to-r from-cosmos-gold to-white bg-clip-text text-transparent">
               Vero Cosmos
             </h1>
             
-            <p className="mt-6 text-lg md:text-xl max-w-2xl mx-auto">
+            <p className="mt-6 text-lg md:text-xl max-w-2xl mx-auto text-white drop-shadow-lg">
               Descubre los secretos del universo y tu conexión con las estrellas
             </p>
             
@@ -66,21 +66,21 @@ const Index = () => {
             <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="glass-card p-6 rounded-xl backdrop-blur-sm bg-white/10 border border-white/20">
                 <h3 className="text-xl font-playfair mb-3 text-cosmos-gold">Carta Natal Personalizada</h3>
-                <p className="text-sm opacity-80">
+                <p className="text-sm opacity-90 text-white">
                   Descubre cómo los planetas influenciaron tu vida desde el momento de tu nacimiento con nuestra detallada carta natal.
                 </p>
               </div>
               
               <div className="glass-card p-6 rounded-xl backdrop-blur-sm bg-white/10 border border-white/20">
                 <h3 className="text-xl font-playfair mb-3 text-cosmos-gold">Predicciones Diarias</h3>
-                <p className="text-sm opacity-80">
+                <p className="text-sm opacity-90 text-white">
                   Recibe orientación diaria basada en los movimientos celestes y cómo estos afectan específicamente a tu signo y ascendente.
                 </p>
               </div>
               
               <div className="glass-card p-6 rounded-xl backdrop-blur-sm bg-white/10 border border-white/20">
                 <h3 className="text-xl font-playfair mb-3 text-cosmos-gold">Lecturas de Tarot</h3>
-                <p className="text-sm opacity-80">
+                <p className="text-sm opacity-90 text-white">
                   Accede a tiradas de tarot personalizadas que te ayudarán a reflexionar sobre tu presente y visualizar posibles futuros.
                 </p>
               </div>

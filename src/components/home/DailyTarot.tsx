@@ -1,16 +1,37 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import TarotCard from '@/components/TarotCard';
 import { drawCards } from '@/lib/tarot-data';
+import { saveTarotReading, getTodaysTarotReading } from '@/lib/tarot-storage';
 
 const DailyTarot: React.FC = () => {
   const [isCardRevealed, setIsCardRevealed] = useState(false);
-  const [dailyCard] = useState(drawCards(1)[0]);
+  const [dailyCard, setDailyCard] = useState(drawCards(1)[0]);
+  const [hasDrawnToday, setHasDrawnToday] = useState(false);
 
-  const handleRevealCard = () => {
+  useEffect(() => {
+    // Check if user has already drawn a card today
+    const checkTodaysReading = async () => {
+      const savedReading = await getTodaysTarotReading();
+      if (savedReading) {
+        setDailyCard(savedReading);
+        setHasDrawnToday(true);
+      }
+    };
+    
+    checkTodaysReading();
+  }, []);
+
+  const handleRevealCard = async () => {
     setIsCardRevealed(true);
+    
+    // Save today's reading if not already saved
+    if (!hasDrawnToday) {
+      await saveTarotReading(dailyCard);
+      setHasDrawnToday(true);
+    }
   };
 
   return (
@@ -40,8 +61,9 @@ const DailyTarot: React.FC = () => {
         <Button 
           className="w-full button-effect px-4 py-2 bg-cosmos-pink bg-opacity-20 rounded-lg text-cosmos-darkGold border border-cosmos-pink"
           onClick={handleRevealCard}
+          disabled={hasDrawnToday && !isCardRevealed}
         >
-          Revelar Mi Carta
+          {hasDrawnToday && !isCardRevealed ? "Ya has tirado el tarot hoy" : "Revelar Mi Carta"}
         </Button>
       )}
     </div>

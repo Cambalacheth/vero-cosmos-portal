@@ -20,7 +20,7 @@ export async function saveNatalChart(natalChart: NatalChartData): Promise<boolea
     const { error } = await supabase
       .from('profiles')
       .update({ 
-        natal_chart: natalChart,
+        natal_chart: natalChart as any, // Cast to any to resolve type incompatibility
         updated_at: new Date().toISOString()
       })
       .eq('id', user.id);
@@ -56,7 +56,7 @@ export async function getUserNatalChart(): Promise<NatalChartData | null> {
       return null;
     }
     
-    return data.natal_chart as NatalChartData;
+    return data.natal_chart as unknown as NatalChartData;
   } catch (error) {
     console.error('Error al obtener la carta natal:', error);
     return null;
@@ -97,7 +97,13 @@ export async function getUserProfile(): Promise<UserProfile | null> {
       throw error;
     }
     
-    return data as UserProfile;
+    // Convert the data properly
+    return {
+      id: data.id,
+      username: data.username,
+      avatar_url: data.avatar_url,
+      natal_chart: data.natal_chart as unknown as NatalChartData
+    };
   } catch (error) {
     console.error('Error al obtener el perfil:', error);
     return null;
@@ -116,6 +122,7 @@ export async function updateUserProfile(profile: Partial<UserProfile>): Promise<
       .from('profiles')
       .update({
         ...profile,
+        natal_chart: profile.natal_chart as any, // Cast to any to resolve type incompatibility
         updated_at: new Date().toISOString()
       })
       .eq('id', user.id);

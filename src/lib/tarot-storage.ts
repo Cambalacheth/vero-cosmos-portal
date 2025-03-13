@@ -1,71 +1,127 @@
 
-import { TarotCard } from './tarot-data';
+import { supabase } from '@/integrations/supabase/client';
 
-export interface SavedReading {
-  id: string;
-  date: string;
-  readingType: {
+export type DrawnCard = {
+  card: {
     id: string;
     name: string;
+    arcana: 'major' | 'minor';
+    suit?: string;
+    element?: string;
+    meaningUpright: string[];
+    meaningReversed: string[];
     description: string;
-    cardCount: number;
+    image: string;
   };
-  deck: {
-    id: string;
-    name: string;
-  };
-  cards: {
-    card: TarotCard;
-    isReversed: boolean;
-    position: number;
-  }[];
-  notes?: string;
-}
+  position?: number;
+  isReversed: boolean;
+};
 
-// Helper functions to save and retrieve readings from localStorage
-export const saveReading = (reading: Omit<SavedReading, 'id' | 'date'>) => {
+// Function to save a tarot reading for today
+export const saveTarotReading = async (drawnCard: DrawnCard): Promise<boolean> => {
   try {
-    // Get existing readings
-    const existingReadings = getReadings();
+    const { data: { user } } = await supabase.auth.getUser();
     
-    // Create a new reading with ID and date
-    const newReading: SavedReading = {
-      ...reading,
-      id: `reading-${Date.now()}`,
-      date: new Date().toISOString(),
-    };
-    
-    // Add the new reading to the list
-    const updatedReadings = [...existingReadings, newReading];
-    
-    // Save to localStorage
-    localStorage.setItem('tarot-readings', JSON.stringify(updatedReadings));
-    
-    return newReading;
+    if (!user) {
+      return false;
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // Check if there's already a reading for today
+    const { data: existingReading } = await supabase
+      .from('tarot_readings')
+      .select('*')
+      .eq('user_id', user.id)
+      .gte('created_at', today.toISOString())
+      .lt('created_at', new Date(today.getTime() + 86400000).toISOString())
+      .single();
+
+    if (existingReading) {
+      // Already have a reading for today, just return
+      return true;
+    }
+
+    // Save the new reading
+    const { error } = await supabase
+      .from('tarot_readings')
+      .insert({
+        user_id: user.id,
+        reading_type: 'daily',
+        cards: [drawnCard]
+      });
+
+    if (error) {
+      console.error('Error saving tarot reading:', error);
+      return false;
+    }
+
+    return true;
   } catch (error) {
     console.error('Error saving tarot reading:', error);
+    return false;
+  }
+};
+
+// Function to get today's tarot reading
+export const getTodaysTarotReading = async (): Promise<DrawnCard | null> => {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      return null;
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const { data, error } = await supabase
+      .from('tarot_readings')
+      .select('*')
+      .eq('user_id', user.id)
+      .eq('reading_type', 'daily')
+      .gte('created_at', today.toISOString())
+      .lt('created_at', new Date(today.getTime() + 86400000).toISOString())
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single();
+
+    if (error || !data) {
+      // No reading found for today, which is expected behavior
+      return null;
+    }
+
+    return data.cards[0] as DrawnCard;
+  } catch (error) {
+    console.error('Error getting today\'s tarot reading:', error);
     return null;
   }
 };
 
-export const getReadings = (): SavedReading[] => {
+// Function to get all saved readings
+export const getSavedReadings = async (): Promise<any[]> => {
   try {
-    const readings = localStorage.getItem('tarot-readings');
-    return readings ? JSON.parse(readings) : [];
-  } catch (error) {
-    console.error('Error retrieving tarot readings:', error);
-    return [];
-  }
-};
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      return [];
+    }
 
-export const deleteReading = (id: string) => {
-  try {
-    const readings = getReadings();
-    const updatedReadings = readings.filter(reading => reading.id !== id);
-    localStorage.setItem('tarot-readings', JSON.stringify(updatedReadings));
-    return true;
+    const { data, error } = await supabase
+      .from('tarot_readings')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error getting saved readings:', error);
+      return [];
+    }
+
+    return data || [];
   } catch (error) {
-    console.error('Error deleting tarot reading:', error);
-    return false;
+    console.error('Error getting saved readings:', error);
+    return [];
   }
 };
