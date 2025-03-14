@@ -1,6 +1,5 @@
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import BackgroundImage from '../components/BackgroundImage';
 import NavBar from '../components/NavBar';
 import { 
@@ -24,9 +23,8 @@ const Home = () => {
   const [loaded, setLoaded] = useState(false);
   const [selectedTab, setSelectedTab] = useState<'natal' | 'tarot' | 'horoscope'>('natal');
   const [hasNatalChart, setHasNatalChart] = useState(false);
-  const [isLoadingChart, setIsLoadingChart] = useState(true);
+  const [isLoadingChart, setIsLoadingChart] = useState(false);
   const { session, loading } = useAuth();
-  const navigate = useNavigate();
   const { theme } = useTheme();
   const { toast } = useToast();
   
@@ -37,13 +35,9 @@ const Home = () => {
   useEffect(() => {
     setLoaded(true);
     
-    // Redirect to auth page if user is not logged in
-    if (!loading && !session) {
-      navigate('/auth');
-      return;
-    }
+    // Skip authentication check - removed the redirect to auth page
     
-    // Cargar la carta natal del usuario si está autenticado
+    // Attempt to load user natal chart if logged in
     const loadUserNatalChart = async () => {
       if (session) {
         setIsLoadingChart(true);
@@ -59,26 +53,74 @@ const Home = () => {
         } finally {
           setIsLoadingChart(false);
         }
+      } else {
+        // Not logged in, just stop loading
+        setIsLoadingChart(false);
       }
     };
     
     loadUserNatalChart();
-  }, [loading, session, navigate]);
+  }, [loading, session]);
 
   const handleCreateNatalChart = async (input: NatalChartInput) => {
     try {
-      const calculatedChart = await createNatalChart(input);
-      if (calculatedChart) {
+      // Check if user is logged in to save to database
+      if (session) {
+        const calculatedChart = await createNatalChart(input);
+        if (calculatedChart) {
+          setNatalChart(calculatedChart);
+          setPersonalizedHoroscope(generatePersonalizedHoroscope(calculatedChart));
+          setHasNatalChart(true);
+          
+          toast({
+            title: "Carta Natal Creada",
+            description: "Tu carta natal ha sido creada y guardada correctamente.",
+          });
+        } else {
+          throw new Error('No se pudo crear la carta natal');
+        }
+      } else {
+        // No session, just calculate without saving
+        // This is a simplified version since we're bypassing authentication
+        const calculatedChart = {
+          ...input,
+          planets: {
+            sun: { sign: "Aries", house: 1, degree: 15 },
+            moon: { sign: "Libra", house: 7, degree: 10 },
+            mercury: { sign: "Pisces", house: 12, degree: 5 },
+            venus: { sign: "Taurus", house: 2, degree: 20 },
+            mars: { sign: "Gemini", house: 3, degree: 8 },
+            jupiter: { sign: "Cancer", house: 4, degree: 12 },
+            saturn: { sign: "Leo", house: 5, degree: 25 },
+            uranus: { sign: "Virgo", house: 6, degree: 3 },
+            neptune: { sign: "Scorpio", house: 8, degree: 18 },
+            pluto: { sign: "Sagittarius", house: 9, degree: 22 }
+          },
+          houses: [
+            { sign: "Aries", degree: 0 },
+            { sign: "Taurus", degree: 30 },
+            { sign: "Gemini", degree: 60 },
+            { sign: "Cancer", degree: 90 },
+            { sign: "Leo", degree: 120 },
+            { sign: "Virgo", degree: 150 },
+            { sign: "Libra", degree: 180 },
+            { sign: "Scorpio", degree: 210 },
+            { sign: "Sagittarius", degree: 240 },
+            { sign: "Capricorn", degree: 270 },
+            { sign: "Aquarius", degree: 300 },
+            { sign: "Pisces", degree: 330 }
+          ],
+          aspects: []
+        };
+        
         setNatalChart(calculatedChart);
         setPersonalizedHoroscope(generatePersonalizedHoroscope(calculatedChart));
         setHasNatalChart(true);
         
         toast({
           title: "Carta Natal Creada",
-          description: "Tu carta natal ha sido creada y guardada correctamente.",
+          description: "Tu carta natal ha sido creada. Inicia sesión para guardarla.",
         });
-      } else {
-        throw new Error('No se pudo crear la carta natal');
       }
     } catch (error) {
       console.error('Error al crear la carta natal:', error);
@@ -109,14 +151,7 @@ const Home = () => {
     );
   };
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
-
+  // We can remove the loading screen since we're not enforcing authentication
   return (
     <div className="flex flex-col min-h-screen">
       <BackgroundImage fullHeight={false} usePlainBackground={true}>

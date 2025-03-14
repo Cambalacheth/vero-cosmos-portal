@@ -1,6 +1,5 @@
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import BackgroundImage from '@/components/BackgroundImage';
 import NavBar from '@/components/NavBar';
 import { useAuth } from '@/contexts/AuthContext';
@@ -10,17 +9,11 @@ import ThemeToggleButton from '@/components/ThemeToggleButton';
 const Community = () => {
   const [loaded, setLoaded] = useState(false);
   const { session, loading } = useAuth();
-  const navigate = useNavigate();
 
   useEffect(() => {
     setLoaded(true);
-    
-    // Redirect to auth page if user is not logged in
-    if (!loading && !session) {
-      navigate('/auth');
-      return;
-    }
-  }, [loading, session, navigate]);
+    // Authentication check removed
+  }, [loading, session]);
 
   if (loading) {
     return (

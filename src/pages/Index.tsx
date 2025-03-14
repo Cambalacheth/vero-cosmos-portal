@@ -30,14 +30,14 @@ const Index = () => {
           
           <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 justify-center">
             <Button 
-              onClick={() => navigate('/auth')}
+              onClick={() => navigate('/home')}
               className="bg-gradient-to-r from-cosmos-gold to-cosmos-darkGold text-white px-6 py-2 hover:opacity-90"
             >
               Comenzar
             </Button>
             <Button 
               variant="outline"
-              onClick={() => navigate('/auth')}
+              onClick={() => navigate('/home')}
               className="border-cosmos-pink text-cosmos-gold px-6 py-2 hover:bg-cosmos-pink/10"
             >
               Iniciar Sesión
