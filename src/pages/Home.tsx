@@ -82,35 +82,36 @@ const Home = () => {
       } else {
         // No session, just calculate without saving
         // This is a simplified version since we're bypassing authentication
-        const calculatedChart = {
-          ...input,
-          planets: {
-            sun: { sign: "Aries", house: 1, degree: 15 },
-            moon: { sign: "Libra", house: 7, degree: 10 },
-            mercury: { sign: "Pisces", house: 12, degree: 5 },
-            venus: { sign: "Taurus", house: 2, degree: 20 },
-            mars: { sign: "Gemini", house: 3, degree: 8 },
-            jupiter: { sign: "Cancer", house: 4, degree: 12 },
-            saturn: { sign: "Leo", house: 5, degree: 25 },
-            uranus: { sign: "Virgo", house: 6, degree: 3 },
-            neptune: { sign: "Scorpio", house: 8, degree: 18 },
-            pluto: { sign: "Sagittarius", house: 9, degree: 22 }
-          },
+        // Create a mock chart that follows the NatalChartData interface
+        const calculatedChart: NatalChartData = {
+          sun: { planet: "Sol", sign: "Aries", house: 1, degree: 15, icon: "☉" },
+          moon: { planet: "Luna", sign: "Libra", house: 7, degree: 10, icon: "☾" },
+          ascendant: { planet: "Ascendente", sign: "Leo", house: 1, degree: 0, icon: "⬆️" },
+          mercury: { planet: "Mercurio", sign: "Pisces", house: 12, degree: 5, icon: "☿️" },
+          venus: { planet: "Venus", sign: "Taurus", house: 2, degree: 20, icon: "♀️" },
+          mars: { planet: "Marte", sign: "Gemini", house: 3, degree: 8, icon: "♂️" },
+          jupiter: { planet: "Júpiter", sign: "Cancer", house: 4, degree: 12, icon: "♃" },
+          saturn: { planet: "Saturno", sign: "Leo", house: 5, degree: 25, icon: "♄" },
+          uranus: { planet: "Urano", sign: "Virgo", house: 6, degree: 3, icon: "⛢" },
+          neptune: { planet: "Neptuno", sign: "Scorpio", house: 8, degree: 18, icon: "♆" },
+          pluto: { planet: "Plutón", sign: "Sagittarius", house: 9, degree: 22, icon: "♇" },
           houses: [
-            { sign: "Aries", degree: 0 },
-            { sign: "Taurus", degree: 30 },
-            { sign: "Gemini", degree: 60 },
-            { sign: "Cancer", degree: 90 },
-            { sign: "Leo", degree: 120 },
-            { sign: "Virgo", degree: 150 },
-            { sign: "Libra", degree: 180 },
-            { sign: "Scorpio", degree: 210 },
-            { sign: "Sagittarius", degree: 240 },
-            { sign: "Capricorn", degree: 270 },
-            { sign: "Aquarius", degree: 300 },
-            { sign: "Pisces", degree: 330 }
+            { house: 1, sign: "Aries", degree: 0 },
+            { house: 2, sign: "Taurus", degree: 30 },
+            { house: 3, sign: "Gemini", degree: 60 },
+            { house: 4, sign: "Cancer", degree: 90 },
+            { house: 5, sign: "Leo", degree: 120 },
+            { house: 6, sign: "Virgo", degree: 150 },
+            { house: 7, sign: "Libra", degree: 180 },
+            { house: 8, sign: "Scorpio", degree: 210 },
+            { house: 9, sign: "Sagittarius", degree: 240 },
+            { house: 10, sign: "Capricorn", degree: 270 },
+            { house: 11, sign: "Aquarius", degree: 300 },
+            { house: 12, sign: "Pisces", degree: 330 }
           ],
-          aspects: []
+          birthDate: input.birthDate,
+          birthTime: input.birthTime,
+          birthplace: input.birthplace
         };
         
         setNatalChart(calculatedChart);
