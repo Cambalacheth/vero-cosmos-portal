@@ -144,7 +144,7 @@ const DailyTarot = () => {
         <div className="flex flex-col items-center">
           <div className="w-40 mx-auto">
             <TarotCard 
-              card={isCardRevealed ? drawnCard?.card : undefined}
+              card={drawnCard?.card}
               isRevealed={isCardRevealed} 
               isReversed={drawnCard?.isReversed || false}
             />

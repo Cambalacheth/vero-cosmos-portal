@@ -4,7 +4,7 @@ import { type TarotCard as TarotCardType } from '@/lib/tarot-data';
 import { cn } from '@/lib/utils';
 
 interface TarotCardProps {
-  card: TarotCardType;
+  card?: TarotCardType; // Make card optional with '?'
   isReversed?: boolean;
   isRevealed?: boolean;
   onClick?: () => void;
@@ -50,14 +50,22 @@ const TarotCard: React.FC<TarotCardProps> = ({
             transform: isRevealed ? 'rotateY(0deg)' : 'rotateY(180deg)',
           }}
         >
-          <img 
-            src={card.imageUrl} 
-            alt={`${card.name}${isReversed ? ' (Invertida)' : ''}`}
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-60 text-white p-2 text-sm text-center">
-            {card.name}{isReversed ? ' (Invertida)' : ''}
-          </div>
+          {card ? ( // Check if card exists before trying to access card.imageUrl
+            <>
+              <img 
+                src={card.imageUrl} 
+                alt={`${card.name}${isReversed ? ' (Invertida)' : ''}`}
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-60 text-white p-2 text-sm text-center">
+                {card.name}{isReversed ? ' (Invertida)' : ''}
+              </div>
+            </>
+          ) : (
+            <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+              <span className="text-gray-500">Carta no disponible</span>
+            </div>
+          )}
         </div>
         
         {/* Back of card */}
